@@ -1,0 +1,45 @@
+/* TTS Revamped Styles */
+/* TTS Revamped Styles */
+
+:root {
+	--dairymilk-grad: linear-gradient(90deg, #000000 10%, #6441a5);
+}
+
+html {
+	background: var(--dairymilk-grad);
+}
+
+/* pretty thin scroll bars */
+
+.scrollp {
+	scrollbar-color: white rebeccapurple;
+	scrollbar-width: thin;
+}
+
+.scrollp ::-webkit-scrollbar {
+	width: 10px;
+}
+
+/* input fields */
+
+.number-input-3 {
+	width: 5rem;
+}
+
+.number-input-4 {
+	width: 5.5rem;
+}
+
+.number-input-5 {
+	width: 6.5rem;
+}
+
+.audiocmd-input {
+	width: 8rem;
+}
+
+/* basic styles */
+
+.b {
+	font-weight: bold;
+}

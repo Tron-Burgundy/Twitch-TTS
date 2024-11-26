@@ -1,0 +1,20 @@
+
+TMI
+    message
+    roomstate, connecting, connected, disconnected, part, join, roomstate, _promiseJoin, emotesets
+
+
+Buttons / Inputs
+    userignored
+    userunignored
+
+    settingschanged
+
+
+
+Speecher always has
+
+    beforespeak
+
+    utterance
+        error, start, end

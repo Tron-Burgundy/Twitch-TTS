@@ -1,0 +1,111 @@
+
+How do we link things together better?
+
+We will have
+
+    Message receiver
+    Message Queue
+    Display Queue
+    Speaker
+
+Extras
+    Bouncer to filter messages
+    Bouncer to filter emojis
+
+
+Ideas:
+    Receiver can have the bouncers and EMIT when message passes
+        Don't really want displayer and speaker queues to make up their minds independently
+
+
+Interfacing between Speaker / MsgQ / DisplayQ ?
+    Speaker emits of course
+
+Buttons like ignore / del?
+    Attach a handler that
+        moves items in DisplayQ
+        checks speakingQ
+        stops Speaker if current. Does MsgQ do that
+
+    EMITs then
+
+They can emit or address both msgQ and dispQ
+
+I could set up a general emitter that things can register with.  In the StreamerBot version you send a message up then it sends
+the event back.  It's a nice system and might make things easier elsewhere.  In fact it'll make things a piece of piss.
+
+Inputs can emit "settingschanged" at the end of their handler
+Buttons / dispQ EVENTS.USER_IGNORED "user:unignored"
+
+Speecher - has an emitter but those could be bumped up to the main emitter
+
+
+Oh tits.  Ok, we want a separation of speech and message Q sort of and we want to be able to:
+cancel messages based on their id.  This means:
+
+buttons must have an id linked to the speech id.  Let's play
+
+if they're done together rather than separately
+
+on(twitch:message) {    // allowed already done
+
+if (queue limit fine)
+
+give utterances a speechQueueId as well as extradata AND THEY DO have queueid
+
+speechId = speak(...)
+
+    // maybe have rowdata and button data - nah, that's stupid.
+add_display(pack, speechId)
+
+    EITHER
+        speak you can set the id
+        or
+        speak returned id put into button
+
+FUCK IT - speech ALWAYS takes the twitch message I send that has the message id
+
+
+
+
+}
+
+All this guff is going to save me like, 3% of the 6000 char length url
+
+Shortening the URL - can't save too much but
+
+!~.()_* don't url encode  so = and space can save 2 chars each +
+I want to allow ! in nicknames so
+flipthatnoise~shit*that*bed.flipthatnoise*shit~that~bed
+
+This is good and easy to parse
+flipthatnoise(shit.that.bed)Drunkula(piss.weasel)
+flipthatnoise(shit*that*bed)Drunkula(piss*weasel)
+
+Look at how ugly this is by comparison
+
+Drunkula~Piss.Weasel*flipthatnoise~shit.that.bed*...
+Drunkula*Piss.Weasel~flipthatnoise*shit.that.bed~...
+Drunkula.Piss*Weasel~flipthatnoise.shit*that*bed~...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

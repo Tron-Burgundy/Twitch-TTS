@@ -1,0 +1,89 @@
+/*
+	Styles for elements such as tab panes
+*/
+
+/*
+.tabs
+	.tab-content
+		.tab-pane
+*/
+
+/* it's the nested tab problem
+
+So don't display tabs on other tabs unless you're active
+*/
+
+.tab-pane {
+	display: block !important; /* undo "display: none;" */
+	visibility: hidden;
+	margin-right: -100%;
+	width: 100%;
+}
+
+.tab-content {
+	display: flex !important;
+	/* background-color: azure; */
+	/* ok - this fixed it! */
+	flex-wrap: wrap;
+}
+
+.tab-content > .is-active {
+/* .tab-pane.is-active { */
+	visibility: visible;
+}
+
+	/* only want to apply this to the first */
+
+.tab-pane > .tab-content {
+	display: none !important;
+}
+
+	/* You only want this to apply to the first, like non-nested */
+
+.tab-pane.is-active > .tab-content {
+	display: flex !important;
+}
+
+	/* top nav tabs */
+
+li > a {background-color: black;}
+
+li.insts-tab.is-active a {
+	background-color: #cf0808 !important;
+}
+
+li.pl-tab.is-active a {
+	background-color: #9900b8 !important;
+}
+
+	/* delete buttons inside tags */
+
+.hide-buttons button {
+	display: none;
+}
+
+.show-buttons span {
+	padding-right: 0 !important;
+}
+
+.show-buttons button {
+	display: block;
+}
+
+#ignoreddiv, #alloweddiv, .modal-card-body, #nicknametagpool {
+	scrollbar-color: white rebeccapurple;
+	scrollbar-width: thin;
+}
+
+.hide-buttons span:hover {
+	cursor: pointer;
+	background-color: blue;
+}
+
+.navbar {
+	background: none;
+}
+	/* voice command */
+.vc {
+	width: 5em;
+}
