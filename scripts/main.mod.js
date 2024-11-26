@@ -90,15 +90,17 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
     if (TT.config.speechQueueLimit !== 0 & speech.speechQueueMap.size >= TT.config.speechQueueLimit) return;
 
     pack = pack.detail;
-console.log("PACK",pack);
     let {channel, userid, userLower} = pack;
     let messageTime = pack.userstate["tmi-sent-ts"];
         // do BEFORE speech
     msgDisp.speech_queue_add_entry(pack);   // this or emit a different message queueingmessage
-console.log("TIME SINCE LAST", messageTime - TT.lastMessageTime );
+
     if (TT.config.chatNoNameRepeatSeconds === 0 ||
+        TT.lastUser !== userid ||
         messageTime - TT.lastMessageTime >= TT.config.chatNoNameRepeatSeconds * 1000 ||
-        channel !== TT.lastChannel) {
+        channel !== TT.lastChannel
+
+    ) {
         // dressup message
         add_speech_before_after(pack);
     }
