@@ -2,7 +2,7 @@
 ///// REVAMPED /////
 ///// REVAMPED /////
 
-import { create_tag_pools } from "./tag-pools.mod";
+import { create_tag_pools } from "./tag-pools.mod.js";
 
 /*  15859 is the max url chars I've got up to in Brave, then it goes wrong
 	15787 in Edge
