@@ -99,9 +99,7 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
         TT.lastUser !== userid ||
         messageTime - TT.lastMessageTime >= TT.config.chatNoNameRepeatSeconds * 1000 ||
         channel !== TT.lastChannel
-
-    ) {
-        // dressup message
+    ) {        // dressup message
         add_speech_before_after(pack);
     }
     console.log("pack AFTER", pack);

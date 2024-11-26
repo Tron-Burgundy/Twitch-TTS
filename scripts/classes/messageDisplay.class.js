@@ -39,6 +39,7 @@ export default class TTSMsgDisplay
 		let speechQRow = dce('nav');
 		speechQRow.id = messageid;
 		speechQRow.dataset.user = userLower;
+		speechQRow.dataset.userCaps = userCaps;
 		speechQRow.classList.add('speechQRow');
 
 			// left = username (left, middle and right are flexbox items, order changed on media query)
@@ -172,26 +173,35 @@ function msg_queue_buttons_click_handler(e) {
     e.stopPropagation();
     let btn = e.target;
 
-    if (btn.constructor !== HTMLButtonElement) return;
-    let type = btn.dataset.type;
+    if (btn.constructor === HTMLButtonElement) {
+        let type = btn.dataset.type;
 
-    switch (type) {
-        case "ignore":
-            TT.emit(EVENTS.USER_IGNORED, btn.dataset);
-            break;
+        switch (type) {
+            case "ignore":
+                TT.emit(EVENTS.USER_IGNORED, btn.dataset);
+                break;
 
-        case "unignore":
-            TT.emit(EVENTS.USER_UNIGNORED, btn.dataset);
-            break;
+            case "unignore":
+                TT.emit(EVENTS.USER_UNIGNORED, btn.dataset);
+                break;
 
-        case "delete":
-            TT.emit(EVENTS.MESSAGE_DELETED, btn.dataset);
-            break;
+            case "delete":
+                TT.emit(EVENTS.MESSAGE_DELETED, btn.dataset);
+                break;
 
-
-        default:
-            return;
+            default:
+                return;
+        }
+        return;
     }
+
+        // emit that a row was clicked
+
+    let row = e.target.nodeName === "NAV" ? e.target : e.target.parentNode;
+    let data = {...row.dataset};
+    data.id = row.id;
+    console.log("target", e.target);
+    TT.emit(EVENTS.MESSAGE_ROW_CLICK, data);
 }
 
 		// colour can be info black dark light white primary link info success warning danger

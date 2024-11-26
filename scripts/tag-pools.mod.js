@@ -52,7 +52,7 @@ export function init_tag_pools() {
     if (initialised) return;
     initialised = true;
 
-    delete_toggles_init(); // should this go to the master?  Your faith against the master's
+    delete_checkboxes_init(); // should this go to the master?  Your faith against the master's
 
 cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
         ///// ADD HANDLERS /////
@@ -86,6 +86,8 @@ cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
 
     TT.emitter.on(EVENTS.USER_ALWAYS_ALLOWED, on_allow_user);
     TT.emitter.on(EVENTS.USER_IGNORED, on_ignore_user);
+        // clicking a message row transfers their name to the nickname page.
+    TT.emitter.on(EVENTS.MESSAGE_ROW_CLICK, e => user_things_populate(e.detail.userCaps));
 
         // add emit types to pools - tags will emit their delete username with that type
         ///// ADD EMIT TYPES FOR POOLS ////
@@ -177,7 +179,7 @@ function user_data_change() {//console.log("CHAAAAAAAAAAAAAAAAAAANGE");
      * sets up a change on checkboxes that will show and hide delete buttons
      */
 
-function delete_toggles_init() {
+function delete_checkboxes_init() {
     let cboxes = qsa(".hide-button-toggle")
 
     for (let chk of cboxes) {
@@ -239,8 +241,8 @@ function on_tag_click(e) {
      * @param {string} user's name
      */
 
-function user_things_populate(user) {
-    let userLC = user.toLocaleLowerCase().trim();
+export function user_things_populate(user) {
+    let userLC = user.toLowerCase().trim();
 
     let nameInput = gid("username");
     let nickInput = gid("nickname");

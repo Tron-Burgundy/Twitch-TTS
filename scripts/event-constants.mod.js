@@ -39,6 +39,8 @@ export const EVENTS = {
     SPEECH_RESUMED: "speech:resumed",
 
     MESSAGE_DELETED: "message:deleted",
+
+    MESSAGE_ROW_CLICK: "message:rowclick",
 }
 
 export default EVENTS;
