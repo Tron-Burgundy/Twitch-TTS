@@ -1,4 +1,4 @@
-import { to_key_value_string } from "./form-inout-filters.mod";
+import { to_key_value_string } from "./form-inout-filters.mod.js";
 
 TT.config = TT.config ?? {}
 
