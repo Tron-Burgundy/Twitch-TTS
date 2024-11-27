@@ -14,8 +14,9 @@ window._r = restore_form_values;
 
 window._url_populate = url_populate;
 
-import { FORM_RESTORE_CONFIG } from "./config.mod.js";
+import { FORM_RESTORE_CONFIG, set_form_defaults } from "./config.mod.js";
 import { FORM_IN_OUT_FILTERS } from "./form-inout-filters.mod.js";
+import EVENTS from "./event-constants.mod.js";
 
 const FORM_RESTORE_VERBOSE = false;
 	// can be used to offer a "Save your settings" thing if you've changed anything
@@ -68,7 +69,7 @@ function query_string_from_inputs(selectors = '.form-save') {
 			console.error("ERROR encoding URI Component:", e);
 		 }
 	};
-		// I could localstore_save() here
+		// I could localstore_save() here NO - you've got one job.  url_populate does that
 	return uri.join('&');
 }
 
@@ -85,21 +86,23 @@ export function restore_form_values(selector = '.form-save', opts)
 {
 	let optsGroup = {...FORM_RESTORE_CONFIG, ...opts}
 
-	let { paramString, localStorageFallback, useCached } = optsGroup;
+	let { paramString, localStorageFallback } = optsGroup;
 	 console.log("Got Opts", optsGroup);
 
-	let inputs = document.querySelectorAll(selector);
 
 	if (!paramString && localStorageFallback) {
-		paramString = localstore_load();
+		 paramString = localstore_load();
 	}
 
 	let getVars = get_query_string_params(paramString);
-		// so far restored params are NEVER used
-	if (useCached && Object.keys(TT.initialUrlParamsToArray).length) {
-		console.log("*********************** USING CACHED VARS OK ***************************", TT.initialUrlParamsToArray);
-		getVars = TT.initialUrlParamsToArray;
+
+	if (!paramString) {
+		// load defaults
+		set_form_defaults();
+		return;
 	}
+
+	let inputs = document.querySelectorAll(selector);
 
 	for (let field of inputs) {
 		const name = field.name ? field.name : field.id;
@@ -208,12 +211,15 @@ function get_query_string_params(params = window.location.search) {
  export function url_populate() {
 	let urlParams = query_string_from_inputs();
 
-	//urlParams = 'autojoin=true&' + urlParams;
 		// sets the value in localStorage to use in form values restore
 	localstore_save(urlParams);
 	let url = window.location.origin + window.location.pathname + '?' + urlParams;
 
 	history.replaceState({}, null, url);
+
+	if (TT.queryStringOnLoad !== window.location.search) {
+        TT.emit(EVENTS.QUERY_PARAMS_CHANGED)
+    }
 		// fill the link box
 	//let urlBox = gid('linkurl');
 	//if (urlBox) urlBox.value = url;

@@ -18,6 +18,7 @@ import { create_commands_voice_map } from "./voice-selects-setup.mod.js";
 
 
 const queryStringOnLoad = window.location.search;
+TT.queryStringOnLoad = queryStringOnLoad;
 window._originalQS = queryStringOnLoad;
 
 let emitter = new Emitter();
@@ -54,7 +55,7 @@ window.addEventListener("load", async function main() {
 
     // the voice selects must be populated before restoring values - unless the voice values also map to hidden field
     populate_voice_selects();
-// load defaults when no other fallback?
+// add fn to load defaults if load defaults if fallback empty fallback?
     restore_form_values();
 
     init_tag_pools();
@@ -103,7 +104,8 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
     ) {        // dressup message
         add_speech_before_after(pack);
     }
-    console.log("pack AFTER", pack);
+
+    //console.log("pack AFTER", pack);
 
     speech.speak(pack);
 
@@ -120,6 +122,8 @@ function add_general_events() {
     TT.emitter.on(EVENTS.SPEECH_ENABLED, on_speech_enabled);
     TT.emitter.on(EVENTS.SPEECH_PAUSED, on_speech_paused);
     TT.emitter.on(EVENTS.SPEECH_RESUMED, on_speech_resumed);
+
+    TT.emitter.on(EVENTS.QUERY_PARAMS_CHANGED, on_query_params_change);
 }
 
 function add_speecher_events() {
@@ -233,18 +237,19 @@ function on_user_unignored(e) {
     msgDisp.unignore_user(e.detail.user);   // oh no you don't!
 }
 
+function on_query_params_change(e) {
+    gid("savewarning").classList.remove("is-hidden");
+}
 
         // adds tagged strings before and after the message and names to nicknames
         // userstate has tmi-sent-ts unix milliseconds
 
 function add_speech_before_after(pack) { //msg, state, channel) {
-    console.log("BEFORE AFTER GETS", pack);
     if (TT.config.chatSayBefore || TT.config.chatSayAfter) {
         // TODO: NICKNAME check needs to be made here
         let {userLower, userCaps, channel} = pack;
 
         // if no digits in username
-console.log("NICKNAME for ", userLower, TT.config.nicknames[userLower]);
 
         if (TT.config.nicknames[userLower]) {
             userCaps = TT.config.nicknames[userLower];

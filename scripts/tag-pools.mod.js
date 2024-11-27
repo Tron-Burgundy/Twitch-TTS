@@ -57,11 +57,11 @@ export function init_tag_pools() {
 cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
         ///// ADD HANDLERS /////
     TT.emitter.on(EVENTS.USER_IGNORED, e => { //       console.log("IGNORED in pools", e);
-        delete_from_tag_pool(e.detail.user, "allowNamed", false);
+        delete_from_tag_pool(e.detail.user, "allownamed", false);
     });
 
     TT.emitter.on(EVENTS.USER_UNALLOWED, e => {       console.log("unallowed in pools", e);
-        delete_from_tag_pool(e.detail.user, "allowNamed", false);
+        delete_from_tag_pool(e.detail.user, "allownamed", false);
     });
 
     TT.emitter.on(EVENTS.USER_UNIGNORED, e => { //       console.log("UNIGNORED in POOLS", e);
@@ -233,7 +233,7 @@ function on_tag_click(e) {
             break;
 
         default:
-            console.log("No.");
+            //console.log("No.");
             return;
     }
 
@@ -272,7 +272,7 @@ export function user_things_populate(user) {
     ////////// TAG POOL CREATES //////////
 
 export function create_tag_pools() {
-    create_simple_tag_pool("allowedTagPool", "allowNamed", EVENTS.USER_UNALLOWED);
+    create_simple_tag_pool("allowedTagPool", "allownamed", EVENTS.USER_UNALLOWED);
     create_simple_tag_pool("ignoredTagPool", "ignoredusers", EVENTS.USER_UNIGNORED);
 
     create_key_value_pool("nicknameTagPool", "nicknames", ": ", EVENTS.NICKNAME_DELETED);
@@ -454,7 +454,7 @@ function del_from_simple_field(inputSrcId, userLC) {
 
   // add user to always tag pool
 function on_allow_user(e) {
-    add_to_simple_pool(e.detail.user, "allowNamed");
+    add_to_simple_pool(e.detail.user, "allownamed");
 }
     // add user to ignored tag pool - username is capsed
 function on_ignore_user(e) {

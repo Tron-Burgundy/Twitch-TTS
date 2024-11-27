@@ -41,6 +41,8 @@ export const EVENTS = {
     MESSAGE_DELETED: "message:deleted",
 
     MESSAGE_ROW_CLICK: "message:rowclick",
+
+    QUERY_PARAMS_CHANGED: "url:paramschanged",
 }
 
 export default EVENTS;

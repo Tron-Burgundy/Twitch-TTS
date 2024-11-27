@@ -1,9 +1,12 @@
+import { to_key_value_string } from "./form-inout-filters.mod";
+
 TT.config = TT.config ?? {}
 
 const TMI_DEFAULT_CHANNELS = [];		// could put this in a different file for easy user use
-const TMI_DEFAULT_ALLOW_NAMED = ["jo", "le", "taxi"];		// these do work
+const TMI_ALLOWED_DEFAULT = ["VeryNiceChap"];		// these do work
 const TMI_IGNORE_DEFAULT = ["nightbot", "streamelements", "moobot", "streamlabs", "fossabot", "songlistbot"]; // LOWERCASE
-const TMI_NICKNAMES_DEFAULT = {flipthatnoise:"Flip That Noise", drunkula: "Piss Weasel"}
+const TMI_NICKNAMES_DEFAULT = {Example:"Nickname"}
+const TMI_AUTOVOICES_DEFAULT = {Example: "ex"}
 
 export const SPACE_REPLACE = "~";  // for others
 export const VOICE_CMDS_QUERY = '[placeholder="!command"]';	// qsa for all the !foo voice commands
@@ -17,9 +20,9 @@ Object.assign(TT.config, // MOST tools add their config to this to make observin
 	allowMods : true,
 	allowVips : true,
 	allowSubs : true,
-	allowNamed  : TMI_DEFAULT_ALLOW_NAMED,
-	ignoredUsers: TMI_IGNORE_DEFAULT,
-	nicknames: TMI_NICKNAMES_DEFAULT,
+	allowNamed  : "",
+	ignoredUsers: "",
+	nicknames: "",
 
 	autoVoiceMap: {},
 
@@ -28,16 +31,18 @@ Object.assign(TT.config, // MOST tools add their config to this to make observin
 	joinDebounceSecs: 3,
 });
 
-
+export function set_form_defaults() {
+	gid("ignoredusers").value = TMI_IGNORE_DEFAULT.join(SPACE_REPLACE);
+	gid("allownamed").value = TMI_ALLOWED_DEFAULT.join(SPACE_REPLACE);
+	gid("nicknames").value = to_key_value_string(TMI_NICKNAMES_DEFAULT);
+	gid("autovoices").value = to_key_value_string(TMI_AUTOVOICES_DEFAULT);
+	gid("s1").value = "ex"
+}
 
 TT.TTSVars = {       // more props added from forms
     flashSetTimeout: null,
     flashDuration: 3500,    // milliseconds
     flashFunc: x => x,      // does nothing for now
-        // updated by the speecher callbacks and speech parameter onchanges
-    voices: [],
-    sayCmds: {},
-    voiceHashToIndex: new Map(),
 }
 
 
@@ -57,15 +62,10 @@ export const clientOpts = 	{
 };
 
 	/**
-	 *
-	 * @param {string} selector selector for form items
-	 * @param {string} paramString string to decode
-	 * @param {bool} idIfNoName use element's id if no name
-	 * @param {bool} localStorageFallback use localStorage if paramString fail
+	 * used in restore form values
 	 */
 
 export const FORM_RESTORE_CONFIG = {
 	paramString: window.location.search,
 	localStorageFallback: false,	// DEBUG for now
-	useCached: false	// use values in TT.initialUrlParamsToArray
 }

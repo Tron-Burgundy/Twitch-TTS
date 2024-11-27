@@ -43,3 +43,8 @@ html {
 .b {
 	font-weight: bold;
 }
+
+/* voice command !foo */
+.vsc {
+	width: 10em;
+}
