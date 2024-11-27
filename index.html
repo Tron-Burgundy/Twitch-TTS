@@ -1252,17 +1252,17 @@
                 </div>
                 <div class="control">
                   <label class="checkbox button is-link is-size-7-mobile is-responsive">
-                    <input class="form-save" type="checkbox" data-type="checkbox" data-to="chatReadEmotes" id="chatreademotes"> emotes
+                    <input class="form-save" type="checkbox" data-type="checkbox" data-to="chatReadEmotes" id="reademotes"> emotes
                   </label>
                 </div>
                 <div class="control">
                   <label class="checkbox button is-link is-size-7-mobile is-responsive">
-                    <input class="form-save" type="checkbox" data-type="checkbox" data-to="chatReadNameDigits" id="chatreadnamedigits"> name digits
+                    <input class="form-save" type="checkbox" data-type="checkbox" data-to="chatReadNameDigits" id="readnamedigits"> name digits
                   </label>
                 </div>
                 <div class="control">
                   <label class="checkbox button is-link is-size-7-mobile is-responsive">
-                    <input class="form-save" type="checkbox" data-type="checkbox" data-to="chatReadOtherCommands" id="chatreadothercommands"> !cmds
+                    <input class="form-save" type="checkbox" data-type="checkbox" data-to="chatReadCommands" id="readcommands"> !cmds
                   </label>
                 </div>
               </div>
@@ -1292,19 +1292,19 @@
               <label class="label">Say before message - tags: {user} {channel}</label>
               <div class="field">
                 <div class="control">
-                  <input class="input form-save" type="text" id="saybefore" placeholder="say before e.g {user} say" data-type="str" data-to="chatSayBefore" value="{user} says">
+                  <input class="input form-save" id="saybefore" type="text" placeholder="say before e.g {user} say" data-type="str" data-to="chatSayBefore" value="{user} says">
                 </div>
               </div>
               <label class="label">Say after message - tags: {user} {channel}</label>
               <div class="field">
                 <div class="control">
-                  <input class="input form-save" type="text" id="sayafter" placeholder="say after e.g said {user}" data-type="str" data-to="chatSayAfter" value="">
+                  <input class="input form-save" id="sayafter" type="text" placeholder="say after e.g said {user}" data-type="str" data-to="chatSayAfter" value="">
                 </div>
               </div>
               <label class="label">No "user says" if they speak again within these seconds.  Zero disables.</label>
               <div class="field">
                 <div class="control">
-                  <input class="input number-input-4 form-save" id="nameSuppressSeconds" type="number" min="0" max="1000" value="10" inputtype="numeric" pattern="[0-9]+" data-type="int" data-to="chatNoNameRepeatSeconds">
+                  <input class="input number-input-4 form-save" id="nameagainsecs" type="number" min="0" max="1000" value="10" inputtype="numeric" pattern="[0-9]+" data-type="int" data-to="chatNoNameRepeatSeconds">
                 </div>
               </div>
               <div class="columns is-mobile">
@@ -1312,7 +1312,7 @@
                   <label class="label">Speech queue limit (0&nbsp;=&nbsp;unlimited)</label>
                   <div class="field">
                     <div class="control">
-                      <input class="input number-input-4 form-save" type="number" id="chatqueuelimit" min="0" max="200" value="40" data-type="int" data-to="speechQueueLimit">
+                      <input class="input number-input-4 form-save" id="qlimit" type="number" min="0" max="200" value="40" data-type="int" data-to="speechQueueLimit">
                     </div>
                   </div>
                 </div>
@@ -1320,7 +1320,7 @@
                   <label class="label">Old queue limit</label>
                   <div class="field">
                     <div class="control">
-                      <input class="input number-input-4 form-save" id="historyQueueLimit" type="number" min="0" max="1000" value="60" data-type="int" data-to="speechQueueOldLimit">
+                      <input class="input number-input-4 form-save" id="oldqlimit" type="number" min="0" max="1000" value="60" data-type="int" data-to="speechQueueOldLimit">
                     </div>
                   </div>
                 </div>
@@ -1330,7 +1330,7 @@
               <label class="label">Filter characters</label>
               <div class="field">
                 <div class="control">
-                  <input class="input Xform-save" id="stripChars" type="text" value="\/#_()€¥¢©®™~¿[]{}&lt;&gt;¡`;÷|¦¬×§¶°" data-to="chatFilterChars" data-type="str">
+                  <input class="input Xform-save" id="stripchars" type="text" value="\/#_()€¥¢©®™~¿[]{}&lt;&gt;¡`;÷|¦¬×§¶°" data-to="chatFilterChars" data-type="str">
                 </div>
               </div>
               <div class="columns is-mobile">
@@ -1338,7 +1338,7 @@
                   <label class="label">Global cooldown seconds</label>
                   <div class="field">
                     <div class="control">
-                      <input class="input number-input-5 form-save" type="number" id="globalcooldown" min="0" max="12000" value="0" data-type="int" data-to="chatCooldownGlobal">
+                      <input class="input number-input-5 form-save" id="globalcool" type="number" min="0" max="12000" value="0" data-type="int" data-to="chatCooldownGlobal">
                     </div>
                   </div>
                 </div>
@@ -1346,7 +1346,7 @@
                   <label class="label">User cooldown seconds</label>
                   <div class="field">
                     <div class="control">
-                      <input class="input number-input-4 form-save" type="number" id="usercooldown" min="0" max="12000" value="0" data-type="int" data-to="chatCooldownUser">
+                      <input class="input number-input-4 form-save" id="usercool" type="number" min="0" max="12000" value="0" data-type="int" data-to="chatCooldownUser">
                     </div>
                   </div>
                 </div>
@@ -1354,12 +1354,12 @@
               <label class="label">Max message seconds, zero disables which might cause Edge to stall.</label>
               <div class="field">
                 <div class="control">
-                  <input class="input number-input-3 form-save" id="messageTimeLimit" type="number" min="0" max="180" value="30" data-type="int" data-to="chatVoiceTimeout">
+                  <input class="input number-input-3 form-save" id="msgtimeout" type="number" min="0" max="180" value="0" data-type="int" data-to="chatVoiceTimeout">
                 </div>
               </div>
               <div class="control">
                 <label class="checkbox is-link is-responsive has-text-weight-medium">
-                  <input class="form-save" id="removeModeratedMessages" type="checkbox" checked data-type="checkbox" data-to="chatRemoveModerated"> Remove moderated messages
+                  <input class="form-save" id="removemodded" type="checkbox" checked data-type="checkbox" data-to="chatRemoveModerated"> Remove moderated messages
                 </label>
               </div>
             </div>

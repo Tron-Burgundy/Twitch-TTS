@@ -83,10 +83,8 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
     let {channel, userid, userLower} = pack;
     let messageTime = pack.userstate["tmi-sent-ts"];
 
-
-
-
-        // do BEFORE speech
+        // do BEFORE speech: check voice command, check removal of general command - name digits are done in the say before
+        // what about the atted thing
     msgDisp.speech_queue_add_entry(pack);   // this or emit a different message queueingmessage
 
     let hasVoiceCmd = starts_with_voice_command(pack.message);
@@ -94,13 +92,12 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
     if (hasVoiceCmd) {
         pack.message = hasVoiceCmd.stripped;
         pack.voiceCmd = hasVoiceCmd.voiceCmd;
+    } else if (pack.message[0] === "!" && TT.config.chatReadCommands === false) {
+        return;
     }
 
-     if (TT.config.chatNoNameRepeatSeconds === 0 ||
-        TT.lastUser !== userid ||
-        messageTime - TT.lastMessageTime >= TT.config.chatNoNameRepeatSeconds * 1000 ||
-        channel !== TT.lastChannel
-    ) {        // dressup message
+    if (TT.config.chatNoNameRepeatSeconds === 0 || TT.lastUser !== userid ||
+        messageTime - TT.lastMessageTime >= TT.config.chatNoNameRepeatSeconds * 1000 ||  channel !== TT.lastChannel) {        // dressup message
         add_speech_before_after(pack);
     }
 
