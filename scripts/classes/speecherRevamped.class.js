@@ -91,7 +91,7 @@ export default class SpeecherRevamped {
 
     sayQueueProcess(immediate = false) {
         if ( !immediate && (this.ss.speaking || this.#isPaused) ) { //  || this.#isSpeaking
-            cclog("Can't speak... eating", "r");
+            //cclog("Can't speak... eating", "r");
             return;
         }
 
