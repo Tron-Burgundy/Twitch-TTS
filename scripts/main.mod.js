@@ -170,7 +170,6 @@ function atted_names_convert(message) {
                 message = message.replace(match, subName);
             }
         }
-        console.log("ATTED CONVERSION HAPPAN", message);
     }
 
     return message;
