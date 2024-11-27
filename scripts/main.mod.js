@@ -15,6 +15,7 @@ import { init_tag_pools, create_tag_pools } from "./tag-pools.mod.js";
 import { populate_voice_selects } from "./voice-selects-setup.mod.js";
 import { create_commands_voice_map } from "./voice-selects-setup.mod.js";
 import { stop_go_icon_off, stop_go_icon_on } from "./view.mod.js";
+import { NAME_DIGITS_REMOVE_REGEX } from "./config.mod.js";
 
 
 const queryStringOnLoad = window.location.search;
@@ -99,6 +100,9 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
 
     msgDisp.speech_queue_add_entry(pack);   // this or emit a different message queueingmessage
 
+        // convert atted names
+    pack.message = atted_names_convert(pack.message);
+
     if (TT.config.chatNoNameRepeatSeconds === 0 || TT.lastUser !== userid ||
         messageTime - TT.lastMessageTime >= TT.config.chatNoNameRepeatSeconds * 1000 ||  channel !== TT.lastChannel) {        // dressup message
         add_speech_before_after(pack);
@@ -129,6 +133,49 @@ function starts_with_voice_command(message) {
 
     return false;
 }
+
+    // convert atted names and underscores so @some_nameIsCool -> some name Is Cool
+    // a-z0-5 then caps split or numbers then anything split
+
+function username_convert(name) {
+    const splitOnNumbersRegex = /(\d+)(\D)/g;
+    const camelCaseRegex = /([a-z0-9]+)([A-Z])/g;  // spaces between theCamelCases
+
+    name = name.replaceAll("_", " ");
+
+    if (TT.config.chatReadNameDigits === false) {
+        name = name.replace(NAME_DIGITS_REMOVE_REGEX, " ");
+    } else {
+        name = name.replace(splitOnNumbersRegex, "$1 $2");
+    }
+
+    name = name.replace(camelCaseRegex, "$1 $2");
+
+    return name;
+}
+
+function atted_names_convert(message) {
+    const atNameRegex = /@\w+/g;    // a-zA-Z0-9_
+
+    const rMatches = message.match(atNameRegex);
+
+    if (rMatches !== null) {
+        for (let match of rMatches) {
+            // DON'T MODIFY MATCH
+            let subName = match;
+
+            subName = username_convert(subName);
+
+            if (match !== subName) {
+                message = message.replace(match, subName);
+            }
+        }
+        console.log("ATTED CONVERSION HAPPAN", message);
+    }
+
+    return message;
+}
+
 
 function add_general_events() {
     TT.emitter.on(EVENTS.TWITCH_MESSAGE, on_twitch_message);
@@ -282,14 +329,7 @@ function add_speech_before_after(pack) { //msg, state, channel) {
             userCaps = TT.config.nicknames[userLower];
         }
         else {  // if no digits in username
-            if ( !TT.config.chatReadNameDigits ) {
-                userCaps = userCaps.replace(/\d/g, ' ');
-            }
-                // camelCase names are more likely to be read correctly
-                // and even more correctly if spaced e.g. MyNameIsBob -> My Name Is Bob
-            userCaps = userCaps.replaceAll("_", " ");
-            const reggie = /([a-z]+)([A-Z])/g;
-            userCaps = userCaps.replace(reggie, "$1 $2");
+            userCaps = username_convert(userCaps);
         }
 
         channel = channel.substring(1); // get rid of #
@@ -302,6 +342,7 @@ function add_speech_before_after(pack) { //msg, state, channel) {
 
     //return msg;
 }
+
 
 function stupid_test_guff() {
 // TT.emitter.on("twitch:message", x => {console.log("twitch:message", x);});

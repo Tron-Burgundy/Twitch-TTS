@@ -11,6 +11,9 @@ const TMI_AUTOVOICES_DEFAULT = {Example: "ex"}
 export const SPACE_REPLACE = "~";  // for others
 export const VOICE_CMDS_QUERY = '[placeholder="!command"]';	// qsa for all the !foo voice commands
 
+// export const NAME_DIGITS_REMOVE_REGEX = /\d+$/g;	// removes from end only
+export const NAME_DIGITS_REMOVE_REGEX = /\d+/g;	// removes from end only
+
 	///// TT.config setup /////
 	///// TT.config setup /////
 
