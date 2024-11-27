@@ -5,8 +5,14 @@
 	--dairymilk-grad: linear-gradient(90deg, #000000 10%, #6441a5);
 }
 
+	/* BULMA ALWAYS HAS A SCROLL BAR - I don't want */
+	/* BULMA ALWAYS HAS A SCROLL BAR - I don't want */
+	/* BULMA ALWAYS HAS A SCROLL BAR - I don't want */
+
 html {
 	background: var(--dairymilk-grad);
+
+	overflow-y: auto;
 }
 
 /* pretty thin scroll bars */

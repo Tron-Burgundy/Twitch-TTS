@@ -169,9 +169,9 @@ function user_data_change() {//console.log("CHAAAAAAAAAAAAAAAAAAANGE");
     }
 
     if (voice.length) {
-        if (TT.config.voicesAuto[userLC] !== voice)
+        if (TT.config.userAutoVoices[userLC] !== voice)
             TT.emit(EVENTS.AUTOVOICE_ADDED, {user, username: userLC, voice});
-    } else if ( TT.config.voicesAuto[userLC] ) {
+    } else if ( TT.config.userAutoVoices[userLC] ) {
         TT.emit(EVENTS.AUTOVOICE_DELETED, {user, username: userLC});
     }
 }
@@ -258,7 +258,7 @@ export function user_things_populate(user) {
 
         // custom voice?
 
-    let vCmd = TT.config.voicesAuto[userLC];
+    let vCmd = TT.config.userAutoVoices[userLC];
 
     if ( !voiceCmdSelect.select_val(vCmd) )
         !voiceCmdSelect.select_val("");

@@ -219,7 +219,9 @@ function get_query_string_params(params = window.location.search) {
 
 	if (TT.queryStringOnLoad !== window.location.search) {
         TT.emit(EVENTS.QUERY_PARAMS_CHANGED)
-    }
+    } else {
+        TT.emit(EVENTS.QUERY_PARAMS_UNCHANGED)
+	}
 		// fill the link box
 	//let urlBox = gid('linkurl');
 	//if (urlBox) urlBox.value = url;

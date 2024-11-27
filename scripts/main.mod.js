@@ -2,7 +2,6 @@
  * I'm the boss.  I do things
  *
  * Should classes at their own listeners or should I pass them on?
- * msgDisplay can listen for userIgnored and userInignored
  */
 window.TT = window.TT ?? {};
 
@@ -15,6 +14,7 @@ import { add_form_element_listeners, FORM_EVENT_HANDLERS_POST } from "./form-eve
 import { init_tag_pools, create_tag_pools } from "./tag-pools.mod.js";
 import { populate_voice_selects } from "./voice-selects-setup.mod.js";
 import { create_commands_voice_map } from "./voice-selects-setup.mod.js";
+import { stop_go_icon_off, stop_go_icon_on } from "./view.mod.js";
 
 
 const queryStringOnLoad = window.location.search;
@@ -36,15 +36,6 @@ export const speech = new SpeecherRevamped();
 window.s = speech; window.m = msgDisp;  // DEBUG
 
 
-window.addEventListener('beforeunload', x => {
-    console.log("beforeunloadevent", x);
-    if (queryStringOnLoad !== window.location.search) {
-        TT.show_modal("saveWarning");
-        x.preventDefault()
-    }
-});
-
-
 window.addEventListener("load", async function main() {
     cclog("Main is happening", "g");
 
@@ -53,21 +44,18 @@ window.addEventListener("load", async function main() {
 
     await speech.ready();
 
-    // the voice selects must be populated before restoring values - unless the voice values also map to hidden field
+    // MUST be before restoring values - unless the voice values also map to hidden field
     populate_voice_selects();
 // add fn to load defaults if load defaults if fallback empty fallback?
     restore_form_values();
 
     init_tag_pools();
-
     create_tag_pools();
 
     add_form_element_listeners();
 
     TT.allchange();
-
         // this listener is added post initial changes because it triggers a lot of activity
-
     add_form_element_listeners(FORM_EVENT_HANDLERS_POST);
 
     create_commands_voice_map();
@@ -94,10 +82,21 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
     pack = pack.detail;
     let {channel, userid, userLower} = pack;
     let messageTime = pack.userstate["tmi-sent-ts"];
+
+
+
+
         // do BEFORE speech
     msgDisp.speech_queue_add_entry(pack);   // this or emit a different message queueingmessage
 
-    if (TT.config.chatNoNameRepeatSeconds === 0 ||
+    let hasVoiceCmd = starts_with_voice_command(pack.message);
+
+    if (hasVoiceCmd) {
+        pack.message = hasVoiceCmd.stripped;
+        pack.voiceCmd = hasVoiceCmd.voiceCmd;
+    }
+
+     if (TT.config.chatNoNameRepeatSeconds === 0 ||
         TT.lastUser !== userid ||
         messageTime - TT.lastMessageTime >= TT.config.chatNoNameRepeatSeconds * 1000 ||
         channel !== TT.lastChannel
@@ -112,6 +111,24 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
     TT.lastChannel = channel; TT.lastUser = userid; TT.lastMessageTime = messageTime;
 }
 
+    /**
+     *  Checks if a message starts with a know voice command
+     * @param {string} message
+     * @returns false or {voiceCmd, stripped}  e.g. voiceCmd: "ftn", "I no longer start !ftn"
+     */
+
+function starts_with_voice_command(message) {
+    if (message[0] !== "!") return false;
+    let start = message.substring(1).split(" ", 1)[0].toLowerCase();
+
+    let voiceExists = TT.config.autoVoiceMap.hasOwnProperty(start);
+
+    if (voiceExists) {    // 2 because of the ! and first space
+        return {voiceCmd: start, stripped: message.substring(2 + start.length)}
+    }
+
+    return false;
+}
 
 function add_general_events() {
     TT.emitter.on(EVENTS.TWITCH_MESSAGE, on_twitch_message);
@@ -124,6 +141,7 @@ function add_general_events() {
     TT.emitter.on(EVENTS.SPEECH_RESUMED, on_speech_resumed);
 
     TT.emitter.on(EVENTS.QUERY_PARAMS_CHANGED, on_query_params_change);
+    TT.emitter.on(EVENTS.QUERY_PARAMS_UNCHANGED, on_query_params_unchanged);
 }
 
 function add_speecher_events() {
@@ -131,14 +149,18 @@ function add_speecher_events() {
     TT.emitter.on("speecher:error", on_speech_error);
     TT.emitter.on("speecher:start", on_speech_started);
     TT.emitter.on("speecher:end", on_speech_ended);
+
     // having prune on before speak means it can allow one extra in
+
     TT.emitter.on(EVENTS.SPEECHER_BEFORE_SPEAK, e => {
         if (TT.config.speechQueueOldLimit > 0)
             msgDisp.speech_queue_old_prune(TT.config.speechQueueOldLimit -1);
 
         let ut = e.detail.utterance;
-        let autoVoiceCmd = TT.config.voicesAuto[ut.customdata.userLower];
+            // check if the utterance had the voice command added or if the user has one
+        let autoVoiceCmd = ut.customdata.voiceCmd || TT.config.userAutoVoices[ut.customdata.userLower];
         let voicePack = TT.config.autoVoiceMap[autoVoiceCmd] || TT.config.autoVoiceMap[undefined];
+
             // I used to clamp this but fuck it.
         if (voicePack) {
             ut.rate = voicePack.rate;
@@ -190,15 +212,14 @@ function on_message_deleted(e) {
 }
 
 function on_speech_disabled() {
-    // msg disp clear, too
     speech.clear();
     speech.cancel();
     msgDisp.speech_queue_all_to_old_messages();
 
     TT.config.chatEnabled = false;
     gid("enablespeech").checked = false;
-    gid("stopgoicon").dataset["icon"] = "bolt";
 
+    stop_go_icon_off();
     on_speech_paused();
 }
 
@@ -207,7 +228,12 @@ function on_speech_enabled() {
     gid("enablespeech").checked = true;
     TT.config.chatEnabled = true;
     //on_speech_resumed();
+    stop_go_icon_on();
 }
+
+// const ICON_OFF_CLASS  = "has-background-danger-50";
+// const ICON_ON_CLASS = "has-background-warning-50";
+
 
 function on_speech_paused() {
     gid("playpauseicon").dataset["icon"] = "play";
@@ -241,26 +267,25 @@ function on_query_params_change(e) {
     gid("savewarning").classList.remove("is-hidden");
 }
 
+function on_query_params_unchanged(e) {
+    gid("savewarning").classList.add("is-hidden");
+}
+
         // adds tagged strings before and after the message and names to nicknames
         // userstate has tmi-sent-ts unix milliseconds
 
 function add_speech_before_after(pack) { //msg, state, channel) {
     if (TT.config.chatSayBefore || TT.config.chatSayAfter) {
-        // TODO: NICKNAME check needs to be made here
         let {userLower, userCaps, channel} = pack;
-
-        // if no digits in username
 
         if (TT.config.nicknames[userLower]) {
             userCaps = TT.config.nicknames[userLower];
         }
-        else {
+        else {  // if no digits in username
             if ( !TT.config.chatReadNameDigits ) {
                 userCaps = userCaps.replace(/\d/g, ' ');
             }
-
                 // camelCase names are more likely to be read correctly
-            //userCaps = state['display-name'];
                 // and even more correctly if spaced e.g. MyNameIsBob -> My Name Is Bob
             userCaps = userCaps.replaceAll("_", " ");
             const reggie = /([a-z]+)([A-Z])/g;
@@ -318,6 +343,16 @@ TT.allchange = function(sel = ".form-save") {
         i.dispatchEvent(ev2);
     }
 }
+
+    /** Warn if settings need changing */
+
+window.addEventListener('beforeunload', x => {
+    console.log("beforeunloadevent", x);
+    if (queryStringOnLoad !== window.location.search) {
+        TT.show_modal("saveWarning");
+        x.preventDefault()
+    }
+});
 
     ///////// DEBUGGING /////////
     ///////// DEBUGGING /////////

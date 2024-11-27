@@ -43,6 +43,7 @@ export const EVENTS = {
     MESSAGE_ROW_CLICK: "message:rowclick",
 
     QUERY_PARAMS_CHANGED: "url:paramschanged",
+    QUERY_PARAMS_UNCHANGED: "url:paramssameasonload",
 }
 
 export default EVENTS;

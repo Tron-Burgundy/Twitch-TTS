@@ -17,14 +17,16 @@
     <script src="/scripts/main.mod.js" type="module"></script>
   </head>
   <body class="my-3 mx-5">
-    <div class="navbar is-fixed-top is-flex is-align-items-center px-5 mt-0 py-0"><span class="button mr-2 is-small is-success has-text-weight-bold" id="playpausebtn" title="Play/Pause and Restart after shutdown"><i class="fas fa-pause" id="playpauseicon"></i></span><span class="button mr-2 is-small is-warning" id="stopgobtn" title="Shutdown.  Stops and clears the queue"><i class="fas fa-power-off" id="stopgoicon"></i></span>
+    <div class="navbar is-fixed-top is-flex is-align-items-center px-5 mt-0 py-0"><span class="button mr-2 is-small is-success has-text-weight-bold" id="playpausebtn" title="Play/Pause and Restart after shutdown"><i class="fas fa-pause" id="playpauseicon"></i></span><span class="button mr-2 is-small" id="stopgobtn" title="Shutdown.  Stops and clears the queue"><i class="fas fa-power-off" id="stopgoicon"></i></span>
       <div class="m-0 is-flex-grow-1 tabs is-fullwidth is-toggle is-small" data-theme="dark" data-target="#ttstabs">
         <ul onClick="window.scrollTo(0,0);">
           <li class="is-active"><a>Speech Queue</a></li>
           <li class="pl-tab"><a>Channels and Voices</a></li>
           <li class="insts-tab"><a>Nicknames and Ignored</a></li>
         </ul>
-      </div><span class="button m-0 ml-2 is-small is-success modal-trigger" data-target="configModal" title="Config"><i class="fas fa-gear"></i></span><span class="button is-hidden m-0 ml-2 is-small has-background-danger-50 has-text-warning-50 modal-trigger" id="savewarning" data-target="saveWarning" title="Bookmark Your Changes!"><i class="fa fa-triangle-exclamation fa-beat-fade"></i></span>
+      </div><span class="button m-0 ml-2 is-small is-success modal-trigger" data-target="configModal" title="Config"><i class="fas fa-gear"></i></span>
+      <!--span.button#savewarning.is-hidden.m-0.ml-2.is-small-->
+      <div class="is-hidden button icon has-background-danger-50 has-text-warning-50 ml-2 px-4 modal-trigger" id="savewarning" data-target="saveWarning" title="Bookmark Your Changes!"><i class="fas fa-lg fa-warning fa-beat-fade"></i></div>
     </div>
     <div class="mb-5">&nbsp;</div>
     <div class="tab-content" id="ttstabs">
@@ -1211,7 +1213,7 @@
             <label class="label">Voice Commands</label>
             <div class="field">
               <div class="control">
-                <input class="input form-save" id="autovoices" placeholder="Voice commands" data-to="voicesAuto" data-type="keyvaluepairs" data-inout="mypairsthing">
+                <input class="input form-save" id="autovoices" placeholder="Voice commands" data-to="userAutoVoices" data-type="keyvaluepairs" data-inout="mypairsthing">
               </div>
             </div>
             <label class="label">Users always allowed (even if not mods)</label>
@@ -1375,11 +1377,13 @@
         <div class="box">
           <button class="delete is-pulled-right" data-target="#saveWarning" aria-label="close"></button>
           <div class="title">BOOKMARK THE PAGE</div>
-          <p class="subtitle">if you want to save your changes.</p>
-          <p class="subtitle">Left the site?</p>
-          <div class="title">press back to restore the changes</div>
+          <div class="subtitle">if you want to save your changes.</div>
+          <div class="mb-5"></div>
+          <div class="title">Already left the site?</div>
+          <div class="subtitle">press back to restore the changes</div>
         </div>
       </div>
+      <button class="modal-close is-large"></button>
     </div>
   </body>
 </html>
