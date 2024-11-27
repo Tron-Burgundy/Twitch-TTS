@@ -87,7 +87,10 @@ cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
     TT.emitter.on(EVENTS.USER_ALWAYS_ALLOWED, on_allow_user);
     TT.emitter.on(EVENTS.USER_IGNORED, on_ignore_user);
         // clicking a message row transfers their name to the nickname page.
-    TT.emitter.on(EVENTS.MESSAGE_ROW_CLICK, e => user_things_populate(e.detail.userCaps));
+    TT.emitter.on(EVENTS.MESSAGE_ROW_CLICK, e => {
+        toast("Loaded <strong>" + e.detail.userCaps + "</strong>", "is-warning");
+        user_things_populate(e.detail.userCaps);
+    });
 
         // add emit types to pools - tags will emit their delete username with that type
         ///// ADD EMIT TYPES FOR POOLS ////

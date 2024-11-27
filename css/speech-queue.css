@@ -14,6 +14,14 @@
 	align-items: center; /* vertically? */
 
 	border-bottom: 1px solid gray;
+
+	transition: background-color 0.4s;
+
+	cursor: pointer;
+}
+
+.speechQRow:hover {
+	background-color:rgb(3, 52, 101);
 }
 
 .speechQUser {

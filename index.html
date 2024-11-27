@@ -1098,62 +1098,85 @@
       </div>
       <div class="tab-pane">
         <!--// IGNORED / ALLOWED PANE ////-->
-        <!--// IGNORED / ALLOWED PANE ////-->
+        <!--// IGNORED / ALLOWED PANE ////
+        .field.is-grouped
+            .field.has-addons.is-horizontal
+                .control
+                    input.input#username(placeholder="user name" autocomplete="off" title="User's name")
+        
+                .control
+                    input.input#nickname(placeholder="nickname" autocomplete="off" title="Nickname")
+        
+                .select
+                    select#voicecommand(title="Voice command to use")
+                        option(value="")
+                            | Use voice
+                        option(value="")
+                            | Default
+        
+                .control
+                    button.button.is-success#updateuser
+                        span.icon
+                            i.fas.fa-circle-play
+        
+            .control
+                button#ignoreuserbtn.button.is-warning Ignore
+        
+            //- .control
+            //-     button#deleteuserbtn.button.is-danger Delete
+            //-         input(type="checkbox").ml-2#deleteuserconfirm
+        
+            .control
+                button#alwaysallowuserbtn.button.is-success Always Allow
+        -->
         <div class="box">
-          <div class="field is-grouped">
-            <div class="field has-addons is-horizontal">
-              <div class="control">
-                <input class="input" id="username" placeholder="user name" autocomplete="off" title="User's name">
-              </div>
-              <div class="control">
-                <input class="input" id="nickname" placeholder="nickname" autocomplete="off" title="Nickname">
-              </div>
-              <div class="select">
-                <select id="voicecommand" title="Voice command to use">
-                  <option value="">Use voice</option>
-                  <option value="">Default</option>
-                </select>
-              </div>
-              <div class="control">
-                <button class="button is-success" id="updateuser"><span class="icon"><i class="fas fa-circle-play"></i></span></button>
+          <div class="is-flex-tablet flex-wrap-nowrap">
+            <div class="div is-flex">
+              <div class="field has-addons is-horizontal">
+                <div class="control" style="flex-basis: 15em">
+                  <input class="input" id="username" placeholder="user name" autocomplete="off" title="User's name">
+                </div>
+                <div class="control" style="flex-basis: 20em">
+                  <input class="input" id="nickname" placeholder="nickname" autocomplete="off" title="Nickname">
+                </div>
+                <div class="select">
+                  <select id="voicecommand" title="Voice command to use">
+                    <option value="">Use voice</option>
+                    <option value="">Default</option>
+                  </select>
+                </div>
+                <div class="control">
+                  <button class="button is-success" id="updateuser"><span class="icon"><i class="fas fa-circle-play"></i></span></button>
+                </div>
               </div>
             </div>
-            <div class="control">
-              <button class="button is-warning" id="ignoreuserbtn">Ignore</button>
-            </div>
-            <div class="control">
-              <button class="button is-success" id="alwaysallowuserbtn">Always Allow</button>
+            <div class="mr-2 is-hidden-mobile"></div>
+            <div class="is-flex is-flex-wrap-nowrap">
+              <div class="control mr-2">
+                <button class="button is-warning" id="ignoreuserbtn">Ignore</button>
+              </div>
+              <div class="control">
+                <button class="button is-success" id="alwaysallowuserbtn">Always Allow</button>
+              </div>
             </div>
           </div>
           <div class="box">
-            <div class="level mb-2">
-              <div class="level-left">
-                <div class="level-item">
-                  <div class="title is-4">Nicknames</div>
-                </div>
-                <div class="level-item">
-                  <input class="hide-button-toggle" id="nickdel" type="checkbox" data-for="nicknameTagPool">
-                </div>
-                <div class="level-item">
-                  <label class="label" for="nickdel">delete</label>
-                </div>
+            <div class="is-flex is-align-items-center mb-2">
+              <div>
+                <div class="title is-5">Nicknames</div>
               </div>
+              <input class="hide-button-toggle mx-2" id="nickdel" type="checkbox" data-for="nicknameTagPool">
+              <label class="label" for="nickdel">delete</label>
             </div>
             <div class="hide-buttons" id="nicknameTagPool"></div>
           </div>
           <div class="box">
-            <div class="level mb-2">
-              <div class="level-left">
-                <div class="level-item">
-                  <div class="title is-4">Auto Voices</div>
-                </div>
-                <div class="level-item">
-                  <input class="hide-button-toggle" id="voicedel" type="checkbox" data-for="autoVoiceTagPool">
-                </div>
-                <div class="level-item">
-                  <label class="label" for="voicedel">delete</label>
-                </div>
+            <div class="is-flex is-align-items-center mb-2">
+              <div>
+                <div class="title is-5">Auto Voices</div>
               </div>
+              <input class="hide-button-toggle mx-2" id="voicedel" type="checkbox" data-for="autoVoiceTagPool">
+              <label class="label" for="voicedel">delete</label>
             </div>
             <div class="hide-buttons" id="autoVoiceTagPool"></div>
           </div>
@@ -1168,18 +1191,12 @@
             <div class="hide-buttons" id="ignoredTagPool"></div>
           </div>
           <div class="box">
-            <div class="level mb-2">
-              <div class="level-left">
-                <div class="level-item">
-                  <div class="title is-4">Always allowed (even if not mods)</div>
-                </div>
-                <div class="level-item">
-                  <input class="hide-button-toggle" id="allowdel" type="checkbox" data-for="allowedTagPool">
-                </div>
-                <div class="level-item">
-                  <label class="label" for="allowdel">delete</label>
-                </div>
+            <div class="is-flex is-align-items-center mb-2">
+              <div>
+                <div class="title is-5">Always allowed (even if not mods)</div>
               </div>
+              <input class="hide-button-toggle mx-2" id="allowdel" type="checkbox" data-for="allowedTagPool">
+              <label class="label" for="allowdel">delete</label>
             </div>
             <div class="hide-buttons" id="allowedTagPool"></div>
           </div>
@@ -1293,7 +1310,7 @@
                   <label class="label">Speech queue limit (0&nbsp;=&nbsp;unlimited)</label>
                   <div class="field">
                     <div class="control">
-                      <input class="input number-input-4 form-save" type="number" id="chatqueuelimit" min="0" max="200" value="10" data-type="int" data-to="speechQueueLimit">
+                      <input class="input number-input-4 form-save" type="number" id="chatqueuelimit" min="0" max="200" value="40" data-type="int" data-to="speechQueueLimit">
                     </div>
                   </div>
                 </div>
@@ -1301,7 +1318,7 @@
                   <label class="label">Old queue limit</label>
                   <div class="field">
                     <div class="control">
-                      <input class="input number-input-4 form-save" id="historyQueueLimit" type="number" min="0" max="1000" value="30" data-type="int" data-to="speechQueueOldLimit">
+                      <input class="input number-input-4 form-save" id="historyQueueLimit" type="number" min="0" max="1000" value="60" data-type="int" data-to="speechQueueOldLimit">
                     </div>
                   </div>
                 </div>
@@ -1358,8 +1375,9 @@
         <div class="box">
           <button class="delete is-pulled-right" data-target="#saveWarning" aria-label="close"></button>
           <div class="title">BOOKMARK THE PAGE</div>
-          <p>if you want to save your changes.</p>
-          <p>you may press back to restore the changes</p>
+          <p class="subtitle">if you want to save your changes.</p>
+          <p class="subtitle">Left the site?</p>
+          <div class="title">press back to restore the changes</div>
         </div>
       </div>
     </div>

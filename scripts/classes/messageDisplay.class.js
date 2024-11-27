@@ -198,10 +198,7 @@ function msg_queue_buttons_click_handler(e) {
         // emit that a row was clicked
 
     let row = e.target.nodeName === "NAV" ? e.target : e.target.parentNode;
-    let data = {...row.dataset};
-    data.id = row.id;
-    console.log("target", e.target);
-    TT.emit(EVENTS.MESSAGE_ROW_CLICK, data);
+    TT.emit(EVENTS.MESSAGE_ROW_CLICK, {...row.dataset, id:row.id});
 }
 
 		// colour can be info black dark light white primary link info success warning danger

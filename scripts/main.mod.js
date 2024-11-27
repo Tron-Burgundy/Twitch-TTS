@@ -36,6 +36,7 @@ window.s = speech; window.m = msgDisp;  // DEBUG
 
 
 window.addEventListener('beforeunload', x => {
+    console.log("beforeunloadevent", x);
     if (queryStringOnLoad !== window.location.search) {
         TT.show_modal("saveWarning");
         x.preventDefault()
