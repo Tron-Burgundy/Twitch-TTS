@@ -91,7 +91,7 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
 
     if (hasVoiceCmd) {
         pack.message = hasVoiceCmd.stripped;
-        pack.voiceCmd = hasVoiceCmd.voiceCmd;
+        pack.voiceCmd = hasVoiceCmd.voiceCmd;// checked for in beforespeak to add the voice to the utterance
     } else if (pack.message[0] === "!" && TT.config.chatReadCommands === false) {
         return;
     }

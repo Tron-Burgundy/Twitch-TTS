@@ -33,6 +33,7 @@ export default class Select {
     constructor(id = null) {
         if (id.constructor === HTMLSelectElement) {
             this.#selectNode = id;
+            this.selectedValue = this.get_val();
         }
         else if (id !== null) {
             this.id = id;
@@ -70,16 +71,13 @@ export default class Select {
 
         // set to a selected value
     select_val(val) {
-        let opts = this.#selectNode ?.options ?? gid(this.#id)?.options ?? null;
+        let opts = this.#selectNode?.options ?? gid(this.#id)?.options ?? null;
 
         if (!opts) return false;
 
-        for (let opt of opts) {
-            if (opt.value === val) {
-                opt.selected = true;
-                return true;
-            }
-        }
+        this.#selectNode.value = val;
+
+        if (val === this.get_val()) return true;
 
         return false;
     }
@@ -91,7 +89,7 @@ export default class Select {
         return this.selectedValue;
     }
         // alias for get_val
-        value = this.get_val;
+    value = this.get_val;
 
     has_val(value) {
         let select = this.#selectNode ?? gid(this.#id) ?? null;
@@ -119,6 +117,7 @@ export default class Select {
         // if it already exists.... pffft
         // DEBUG creates a HTMLSelect with our id - this is crap, I want it to be able to create an anonymous one
         // NEEDS CHANGING
+
         /**
          * Creates a html select
          * @param {*} options
@@ -137,6 +136,7 @@ export default class Select {
         sel.id = this.#id;
 
         let opts = this.create_options(options);
+
         if (opts) {
             sel.replaceChildren(...opts);
         }
@@ -154,7 +154,9 @@ export default class Select {
 
     replace_options(options) {
         if (!this.#selectNode) {
-            this.#id = this.#id;
+
+            //this.#id = this.#id;
+
             if (!this.#selectNode) {
                 toast("Can't replace options on select with id: " + this.#id, "is-danger", 8000);
                 console.error("ERROR replace_options error on select with id: " + this.#id);
@@ -164,12 +166,16 @@ export default class Select {
             // selected may carry over
         this.selectedValue = this.get_val();
 
+console.log("SELECTED VALUE", this.selectedValue);
+
         let opts = this.create_options(options);
 
         if (opts) {
             this.#selectNode.replaceChildren(...opts);
         }
-// console.log("OPTIONS", opts);
+
+        if (this.staySelected) this.#selectNode.value = this.selectedValue;
+            //read it back
         this.selectedValue = this.get_val();
 
         return opts;
@@ -225,9 +231,12 @@ export default class Select {
             let dataset = o.length > 2 ? o[2] : {}
             let opt = this.create_option(o[0], o[1], dataset);
 
-            if (this.staySelected && opt.value === this.selectedValue) opt.selected = 'selected';
+            //if (this.staySelected && opt.value === this.selectedValue) opt.selected = 'selected';
             opts.push(opt);
         }
+
+        //if (this.staySelected) opt.selected = 'selected';
+
 
         return opts;
     }

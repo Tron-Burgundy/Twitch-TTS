@@ -87,6 +87,8 @@ export function create_commands_voice_map() {
      * options for the select have data-lang that the voice filter select uses
      */
 
+let selectsInitialised = true;
+
 export function populate_voice_selects() {
     // get the selects
     let selects = qsa(".voice-select");
@@ -102,7 +104,8 @@ export function populate_voice_selects() {
         let opts = sObj.replace_options(hashToVoiceNameMap);
 
         sObj.add("", "Choose Voice", {}, 0);    // insert a default
-        sObj.select_val("");
+        if (selectsInitialised === false)
+            sObj.select_val("");
 
             // add data-lang to the options the lazy way by using the hash map
         for (let opt of opts) {
@@ -115,6 +118,8 @@ export function populate_voice_selects() {
         fill_voice_filter_select(sFilter);
         sFilter.on("change", on_voices_filter_select_change);
     }
+
+    selectsInitialised = true;
 }
 
     /**
