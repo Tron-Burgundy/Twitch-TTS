@@ -5,8 +5,8 @@ TT.config = TT.config ?? {}
 const TMI_DEFAULT_CHANNELS = [];		// could put this in a different file for easy user use
 const TMI_ALLOWED_DEFAULT = ["VeryNiceChap"];		// these do work
 const TMI_IGNORE_DEFAULT = ["nightbot", "streamelements", "moobot", "streamlabs", "fossabot", "songlistbot"]; // LOWERCASE
-const TMI_NICKNAMES_DEFAULT = {Example:"Nickname"}
-const TMI_AUTOVOICES_DEFAULT = {Example: "ex"}
+const TMI_NICKNAMES_DEFAULT = {Example:"Nickname Click Me"}
+const TMI_AUTOVOICES_DEFAULT = {Example_2_click_me: "ex"}
 
 export const SPACE_REPLACE = "~";  // for others
 export const VOICE_CMDS_QUERY = '[placeholder="!command"]';	// qsa for all the !foo voice commands
@@ -70,5 +70,5 @@ export const clientOpts = 	{
 
 export const FORM_RESTORE_CONFIG = {
 	paramString: window.location.search,
-	localStorageFallback: false,	// DEBUG for now
+	localStorageFallback: true,	// DEBUG for now
 }

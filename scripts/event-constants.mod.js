@@ -30,7 +30,7 @@ export const EVENTS = {
     SPEECHER_CANCELLED: "speecher:cancelled",
     SPEECHER_CANCELLED_CURRENT: "speecher:cancelledcurrent",
     SPEECHER_REJECTED: "speecher:rejected",
-    SPEECHER_VOICES_CHANGED: "speecher:voiceschange",
+    SPEECHER_VOICES_CHANGED: "speecher:voiceschanged",
     SPEECHER_READY: "speecher:ready",
 
     SPEECH_DISABLED: "speech:disabled",

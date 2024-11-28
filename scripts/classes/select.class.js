@@ -7,6 +7,11 @@
  * Changes:
  *  add() now has a 4th parameter for the insert index make sure to select_val after
  *  Now accepts string or htmlSelectElement in the constructor
+ *
+ * REMEMBER: Select values are strings.  1 => "1", false => "false", null => "null"
+ * <option value> equates to ""
+ * <option> equates to the text of the option
+ * Selecting a value that doesn't exist will make the select blank and null will be returned for the value - actual null
  */
 
 let dce = x => document.createElement(x);
@@ -16,7 +21,6 @@ export default class Select {
     #id = null;  // html id of the element
     #selectNode = null;
 
-    selectedValue = null;
     staySelected = true;    // if the entries change keep the selected value
 
     sortByText = false;      //
@@ -33,7 +37,6 @@ export default class Select {
     constructor(id = null) {
         if (id.constructor === HTMLSelectElement) {
             this.#selectNode = id;
-            this.selectedValue = this.get_val();
         }
         else if (id !== null) {
             this.id = id;
@@ -53,7 +56,6 @@ export default class Select {
                 console.warn(`Select class WARNING: The element with the id "${val}" is not a select element.  It is ${selNode.constructor}`)
             }
             this.#selectNode = selNode;
-            this.selectedValue = this.get_val(val);
         } else {
             this.#selectNode = dce("select");
             this.#selectNode.id = val;
@@ -85,11 +87,13 @@ export default class Select {
         // get selected value
     get_val(value = null) {
         let select = this.#selectNode ?? gid(this.#id) ?? null;
-        this.selectedValue = select?.selectedIndex >= 0 ? select.options[select.selectedIndex].value : null;
-        return this.selectedValue;
+        let selectVal = select?.selectedIndex >= 0 ? select.options[select.selectedIndex].value : null;
+        return selectVal;
     }
         // alias for get_val
     value = this.get_val;
+    val = this.get_val;
+
 
     has_val(value) {
         let select = this.#selectNode ?? gid(this.#id) ?? null;
@@ -135,7 +139,7 @@ export default class Select {
         let sel = document.createElement('select');
         sel.id = this.#id;
 
-        let opts = this.create_options(options);
+        let opts = this.create_option_set(options);
 
         if (opts) {
             sel.replaceChildren(...opts);
@@ -164,19 +168,15 @@ export default class Select {
             }
         }
             // selected may carry over
-        this.selectedValue = this.get_val();
+        let currValue = this.get_val();
 
-console.log("SELECTED VALUE", this.selectedValue);
-
-        let opts = this.create_options(options);
+        let opts = this.create_option_set(options);
 
         if (opts) {
             this.#selectNode.replaceChildren(...opts);
         }
 
-        if (this.staySelected) this.#selectNode.value = this.selectedValue;
-            //read it back
-        this.selectedValue = this.get_val();
+        if (this.staySelected) this.#selectNode.value = currValue;
 
         return opts;
     }
@@ -187,32 +187,31 @@ console.log("SELECTED VALUE", this.selectedValue);
          * @returns HTMLOptGroupElement, false
          */
 
-    create_options(options = []) {
+    create_option_set(optsData = []) {
         //console.log("Create options received:", options);
         // ensure opts is [[key,val], [key,val], [key,val]]
-        if (Array.isArray(options)) {  // if single values, not pairs then create pairs
-            options = [...options] ; // create a copy so we don't affect the passed array
+        if (Array.isArray(optsData)) {  // if single values, not pairs then create pairs
+            optsData = [...optsData] ; // create a copy so we don't affect the passed array
 
-            for (let idx = 0; idx < options.length; idx++) {
-                if (options[idx] instanceof Array) {
-                    if (options[idx].length < 2) { // array of arrays but they're singular - weird
-                        options[idx] = [options[idx][0], options[idx][0]];
-                    } else {    // a single value, make the text the value
+            for (let idx = 0; idx < optsData.length; idx++) {
+                if (optsData[idx] instanceof Array) {
+                    if (optsData[idx].length < 2) { // array of arrays but they're singular - weird but make the value the text
+                        optsData[idx] = [optsData[idx][0], optsData[idx][0]];
+                    } else {
                         //console.log("It's a pair length", options[idx].length, options[idx][0], options[idx][1] );
-                        let extra = options[idx].length > 2 ? options[idx][2] : {}
-                        options[idx] = [options[idx][0], options[idx][1], extra];
+                        let extra = optsData[idx].length > 2 ? optsData[idx][2] : {}
+                        optsData[idx] = [optsData[idx][0], optsData[idx][1], extra];
                     }
-                } else {
-                    options[idx] = [options[idx], options[idx]];
+                } else {    // a single value, make text and value same
+                    optsData[idx] = [optsData[idx], optsData[idx]];
                 }
             }
-            //options = opts;
-        } else if (options?.constructor === Object) {    //console.log("IIIIIIIIIIIIIIIIIT's an OBJECT", options);
-            options = Object.keys(options).map(k => [k, options[k]]);
-        } else if (options?.constructor === Map) {       //console.log("IIIIIIIIIIIIIIIIIT's an MAPPPP", options);
-            options = options.entries().toArray();
+        } else if (optsData?.constructor === Object) {    // OBJECT
+            optsData = Object.keys(optsData).map(k => [k, optsData[k]]);
+        } else if (optsData?.constructor === Map) {       // MAP
+            optsData = optsData.entries().toArray();
         } else {
-            console.error("Select.create_options() passed neither an object nor array nor map", options);
+            console.error("Select.create_options() passed neither an object nor array nor map", optsData);
             return false;
         }
 
@@ -221,12 +220,12 @@ console.log("SELECTED VALUE", this.selectedValue);
         let opts = [];
             // alpha sort the object's keys
         if ( this.sortByText ) {
-            options.sort( (a,b) => a[1].toString().localeCompare(b[1].toString()) );
+            optsData.sort( (a,b) => a[1].toString().localeCompare(b[1].toString()) );
         } else if ( this.sortByValues ) {
-            options.sort( (a,b) => a[0].localeCompare(b[0]) );
+            optsData.sort( (a,b) => a[0].localeCompare(b[0]) );
         }
 
-        for (let o of options) {
+        for (let o of optsData) {
                 // does the option have a dataset as the 3rd parameter
             let dataset = o.length > 2 ? o[2] : {}
             let opt = this.create_option(o[0], o[1], dataset);
@@ -236,8 +235,6 @@ console.log("SELECTED VALUE", this.selectedValue);
         }
 
         //if (this.staySelected) opt.selected = 'selected';
-
-
         return opts;
     }
 
@@ -268,7 +265,8 @@ console.log("SELECTED VALUE", this.selectedValue);
             // null defaults to end
         let insertIndex = null;
         let opts = this.#selectNode.options;
-            // sorted ? Brute force the index rather than binary division
+
+            // if sorting find the insert point rather than sorting the entire option set
 
         if (insertAt !== null) {
             insertIndex = parseInt(insertAt);

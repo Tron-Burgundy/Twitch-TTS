@@ -87,7 +87,7 @@ export function create_commands_voice_map() {
      * options for the select have data-lang that the voice filter select uses
      */
 
-let selectsInitialised = true;
+// let selectsInitialised = true;
 
 export function populate_voice_selects() {
     // get the selects
@@ -103,10 +103,7 @@ export function populate_voice_selects() {
 
         let opts = sObj.replace_options(hashToVoiceNameMap);
 
-        sObj.add("", "Choose Voice", {}, 0);    // insert a default
-        if (selectsInitialised === false)
-            sObj.select_val("");
-
+        sObj.add("", "Choose Voice", {}, 0);    // insert a default.  If staySelected is true this won't matter
             // add data-lang to the options the lazy way by using the hash map
         for (let opt of opts) {
             opt.dataset["lang"] = hashToVoiceMap.get(opt.value).lang.split("-")[0];
@@ -115,28 +112,18 @@ export function populate_voice_selects() {
 
     for (let sel of filters) {
         let sFilter = new Select(sel);
+        sFilter.staySelected = true;   // onVoicesChanged may spike this
+        sFilter.sortByText = true;
         fill_voice_filter_select(sFilter);
+            // DON'T use a closure as it'll add an extra one every time
         sFilter.on("change", on_voices_filter_select_change);
+        // trigger onchange to re-filter the select list
+        sFilter.trigger_onchange();
     }
 
-    selectsInitialised = true;
+    // selectsInitialised = true;
 }
 
-    /**
-     * converts voiceURIs to 8 character hashes for url vars
-     * creates hashToVoiceMap of synthesis voices
-     * creates hashToVoiceNameMap for prettified voice names
-     */
-
-function setup_voice_hashes() {
-    hashToVoiceMap.clear()
-
-    for (let k in s.voiceMap) {
-        let hash = quick_hash(s.voiceMap[k].voiceURI);
-        hashToVoiceMap.set(hash, s.voiceMap[k]);
-        hashToVoiceNameMap.set( hash, cleanup_voice_name(s.voiceMap[k].name) );
-    }
-}
 
     /**
      *
@@ -182,6 +169,24 @@ function on_voices_filter_select_change(e) {
             opt.classList.add("is-hidden");
     }
 }
+
+
+    /**
+     * converts voiceURIs to 8 character hashes for url vars
+     * creates hashToVoiceMap of synthesis voices
+     * creates hashToVoiceNameMap for prettified voice names
+     */
+
+function setup_voice_hashes() {
+    hashToVoiceMap.clear()
+
+    for (let k in s.voiceMap) {
+        let hash = quick_hash(s.voiceMap[k].voiceURI);
+        hashToVoiceMap.set(hash, s.voiceMap[k]);
+        hashToVoiceNameMap.set( hash, cleanup_voice_name(s.voiceMap[k].name) );
+    }
+}
+
 
 
     /**
