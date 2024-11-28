@@ -87,8 +87,6 @@ export function create_commands_voice_map() {
      * options for the select have data-lang that the voice filter select uses
      */
 
-// let selectsInitialised = true;
-
 export function populate_voice_selects() {
     // get the selects
     let selects = qsa(".voice-select");
@@ -113,15 +111,13 @@ export function populate_voice_selects() {
     for (let sel of filters) {
         let sFilter = new Select(sel);
         sFilter.staySelected = true;   // onVoicesChanged may spike this
-        sFilter.sortByText = true;
+        sFilter.sortByText = false; // it's done for us
         fill_voice_filter_select(sFilter);
             // DON'T use a closure as it'll add an extra one every time
         sFilter.on("change", on_voices_filter_select_change);
-        // trigger onchange to re-filter the select list
+            // trigger onchange to re-filter the select list
         sFilter.trigger_onchange();
     }
-
-    // selectsInitialised = true;
 }
 
 
@@ -133,7 +129,7 @@ export function populate_voice_selects() {
 function fill_voice_filter_select(select) {
     let voices = speechSynthesis.getVoices();
 
-    let langs = [], langsR = [];
+    let langs = {}, langsR = [];
 
     voices.map( (v, index) => {
         let [lang, region] = v.lang.split('-');
@@ -145,11 +141,10 @@ function fill_voice_filter_select(select) {
             langs[lang] = langW[1].split(" (")[0]; // English (Nigeria) -> English
         }
     });
-        // the object will be magically naturally sorted
-    langs = Object.entries(langs);  // to [ [val, text], [val, text], ... ]
-    langs.unshift(["", "All Voices", {"all": true}]);
-
+    // the object will be magically naturally sorted with English at the top
+    //langs = Object.entries(langs);  // no need to [ [val, text], [val, text], ... ]
     select.replace_options(langs);
+    select.add("", "All Voices", {}, 0);
 }
 
     /**

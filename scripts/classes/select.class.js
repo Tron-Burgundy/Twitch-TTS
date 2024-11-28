@@ -31,37 +31,44 @@ export default class Select {
 
         /**
          *
-         * @param {string id, HTMLSelectNode} id
+         * @param {string obj, HTMLSelectNode} id
          */
 
-    constructor(id = null) {
-        if (id.constructor === HTMLSelectElement) {
-            this.#selectNode = id;
-        }
-        else if (id !== null) {
-            this.id = id;
+    constructor(obj = null) {
+        if (obj.constructor === HTMLSelectElement) {
+            this.#selectNode = obj;
+        }   // assume a string
+        else if (obj !== null) {
+            this.id = obj;   // setter creates the select element
         }
     }
 
-        // if the id is of an existing element it
+        /**
+         * adopts an existing select if the value passed is an id
+         * creates a select otherwise and sets its id to val
+         */
 
     set id(val) {
         let selNode = gid(val);
         //console.log("SETTING select id to ", val, selNode);
 
             // check if selNode's constructor is HTMLSelectElement
-
+            // adopt what the id points to
         if (selNode) {
             if (selNode.constructor !== HTMLSelectElement) {
                 console.warn(`Select class WARNING: The element with the id "${val}" is not a select element.  It is ${selNode.constructor}`)
             }
             this.#selectNode = selNode;
-        } else {
-            this.#selectNode = dce("select");
-            this.#selectNode.id = val;
+            this.#id = val;
+            return;
         }
+
             // set as it may be created later
-        this.#id = val;
+        this.#selectNode = dce("select");
+        if (val) {
+            this.#selectNode.id = val;
+            this.#id = val;
+        }
     }
 
     get id() {
@@ -124,22 +131,21 @@ export default class Select {
 
         /**
          * Creates a html select
-         * @param {*} options
-         * @param {*} noReplace
+         * @param {Array, Object, Map} optsData
+         * @param {boolean} noReplace whether to replace our selectNode with the newly created select
          * @returns HTMLSelectElement
          */
 
-    create(options = [], noReplace = false) {
-        if (!this.#id.toString().length) {
+    create_select(optsData = [], noReplace = false) {
+        /* if (!this.#id.toString().length) {
             console.error("ERROR: Can't create a select with no id");
             toast("Set an id for the select first", "is-error", 8000);
             return false;
-        }
+        } */
 
         let sel = document.createElement('select');
-        sel.id = this.#id;
 
-        let opts = this.create_option_set(options);
+        let opts = this.create_option_set(optsData);
 
         if (opts) {
             sel.replaceChildren(...opts);
@@ -156,21 +162,16 @@ export default class Select {
          * @returns HTMLOptGroupElement / false
          */
 
-    replace_options(options) {
+    replace_options(optsData) {
         if (!this.#selectNode) {
-
-            //this.#id = this.#id;
-
-            if (!this.#selectNode) {
-                toast("Can't replace options on select with id: " + this.#id, "is-danger", 8000);
-                console.error("ERROR replace_options error on select with id: " + this.#id);
-                return false;
-            }
+            toast("Can't replace options on select with id: " + this.#id, "is-danger", 8000);
+            console.error("ERROR replace_options error on select with id: " + this.#id);
+            return false;
         }
             // selected may carry over
         let currValue = this.get_val();
 
-        let opts = this.create_option_set(options);
+        let opts = this.create_option_set(optsData);
 
         if (opts) {
             this.#selectNode.replaceChildren(...opts);
@@ -184,7 +185,7 @@ export default class Select {
         /**
          *
          * @param {Array, object, map} options
-         * @returns HTMLOptGroupElement, false
+         * @returns HTMLOptGroupElement or false
          */
 
     create_option_set(optsData = []) {
@@ -215,7 +216,7 @@ export default class Select {
             return false;
         }
 
-        // console.log("OPTIONS FOR CREATE:", options);
+            // sort, create, return
 
         let opts = [];
             // alpha sort the object's keys
@@ -225,22 +226,18 @@ export default class Select {
             optsData.sort( (a,b) => a[0].localeCompare(b[0]) );
         }
 
-        for (let o of optsData) {
-                // does the option have a dataset as the 3rd parameter
+        for (let o of optsData) { // does the option have a dataset as the 3rd parameter
             let dataset = o.length > 2 ? o[2] : {}
             let opt = this.create_option(o[0], o[1], dataset);
 
-            //if (this.staySelected && opt.value === this.selectedValue) opt.selected = 'selected';
             opts.push(opt);
         }
 
-        //if (this.staySelected) opt.selected = 'selected';
         return opts;
     }
 
 
     create_option(val, text, dataset = {}) {
-        // console.log("create_option received", val, text, dataset);
         let opt = dce("option");
         opt.value = val; opt.text = text;
         if (Object.keys(dataset).length) {
