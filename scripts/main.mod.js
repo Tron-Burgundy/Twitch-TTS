@@ -24,13 +24,10 @@ window._originalQS = queryStringOnLoad;
 
 let emitter = new Emitter();
 TT.emitter = emitter;
-TT.on = emitter.on.bind(emitter);
 TT.emit = function (x,y) { emitter.emit(x, y); }
     //TT.emit = emitter.emit; // can't do this.  Cannot read private member #eventDummy from an object whose class did not declare it.  You'd have to bind anyway
 
-TT.lastUser = "";
-TT.lastChannel = "";
-TT.lastMessageTime = 0; // milliseconds from Twitch message
+TT.lastUser = ""; TT.lastChannel = ""; TT.lastMessageTime = 0; // milliseconds from Twitch message
 
 let msgDisp = new TTSMsgDisplay();
 export const speech = new SpeecherRevamped();
@@ -47,7 +44,7 @@ window.addEventListener("load", async function main() {
 
     // MUST be before restoring values - unless the voice values also map to hidden field
     populate_voice_selects();
-// add fn to load defaults if load defaults if fallback empty fallback?
+
     restore_form_values();
 
     init_tag_pools();
@@ -56,7 +53,7 @@ window.addEventListener("load", async function main() {
     add_form_element_listeners();
 
     TT.allchange();
-        // this listener is added post initial changes because it triggers a lot of activity
+        // these listeners is added post initial changes because it triggers a lot of activity
     add_form_element_listeners(FORM_EVENT_HANDLERS_POST);
 
     create_commands_voice_map();
@@ -85,7 +82,6 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
     let messageTime = pack.userstate["tmi-sent-ts"];
 
         // do BEFORE speech: check voice command, check removal of general command - name digits are done in the say before
-        // what about the atted thing
 
     let hasVoiceCmd = starts_with_voice_command(pack.message);
 
@@ -205,7 +201,7 @@ function add_speecher_events() {
         let ut = e.detail.utterance;
             // check if the utterance had the voice command added or if the user has one
         let autoVoiceCmd = ut.customdata.voiceCmd || TT.config.userAutoVoices[ut.customdata.userLower];
-        let voicePack = TT.config.autoVoiceMap[autoVoiceCmd] || TT.config.autoVoiceMap[undefined];
+        let voicePack = ut.customdata.voicepack || TT.config.autoVoiceMap[autoVoiceCmd] || TT.config.autoVoiceMap[undefined];
 
             // I used to clamp this but fuck it.
         if (voicePack) {
@@ -273,20 +269,10 @@ function on_speech_enabled() {
     gid("stopgoicon").dataset["icon"] = "power-off";
     gid("enablespeech").checked = true;
     TT.config.chatEnabled = true;
-    //on_speech_resumed();
+    on_speech_resumed();
     stop_go_icon_on();
 }
 
-// const ICON_OFF_CLASS  = "has-background-danger-50";
-// const ICON_ON_CLASS = "has-background-warning-50";
-
-
-function on_speech_paused() {
-    gid("playpauseicon").dataset["icon"] = "play";
-    gid("pausespeech").checked = true;
-    TT.config.chatPaused = true;
-    speech.pause();
-}
 
 function on_speech_resumed() {
     gid("playpauseicon").dataset["icon"] = "pause";
@@ -297,6 +283,14 @@ function on_speech_resumed() {
         // let it start the engine if disabled
     if (TT.config.chatEnabled === false ) on_speech_enabled();
 }
+
+function on_speech_paused() {
+    gid("playpauseicon").dataset["icon"] = "play";
+    gid("pausespeech").checked = true;
+    TT.config.chatPaused = true;
+    speech.pause();
+}
+
 
 function on_user_ignored(e) {
     console.log("IGNORED DATA", e);

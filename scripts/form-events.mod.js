@@ -5,12 +5,14 @@ import EVENTS from "./event-constants.mod.js";
 import { create_commands_voice_map } from "./voice-selects-setup.mod.js";
 // import Select from "./classes/select.class.js";
 import { url_populate } from "./form-saver.mod.js";
-import "./form-saver.mod.js";
+//import "./form-saver.mod.js";
+import { hashToVoiceMap } from "./voice-selects-setup.mod.js";
 
 import { FORM_FIELD_TO_CONVERTERS } from "./config-setters.mod.js";
 import { voiceCmdSelect } from "./voice-selects-setup.mod.js";
 
-import { VOICE_CMDS_QUERY } from "./config.mod.js";
+import { VOICE_CMDS_QUERY, TEST_MESSAGE } from "./config.mod.js";
+import { speech } from "./main.mod.js";
 
 const FORM_EVENT_HANDLERS_INITIAL = [
     {selector: '[data-to]', event: 'change', function: on_form_field_change, params: {}},
@@ -29,6 +31,8 @@ const FORM_EVENT_HANDLERS_INITIAL = [
     {selector: 'input[type="range"]', event: 'input', function: on_slider_input, params: {}},
     {selector: VOICE_CMDS_QUERY, event: 'change', function: on_voice_command_change, params: {}},
 
+    {selector: "button[data-index]", event: 'click', function: on_test_btn_click, params: {}},
+
 ];
 
 export const FORM_EVENT_HANDLERS_POST = [
@@ -36,6 +40,7 @@ export const FORM_EVENT_HANDLERS_POST = [
     // rebuild voice map
     {selector: '#voicepanels input, .voice-select', event: 'change', function: create_commands_voice_map, params: {}},
 ];
+
 
 
 function on_play_pause_click(e) {
@@ -56,7 +61,7 @@ function on_voice_command_change(e) {
         // repopulate the voice command select
 
     let sels = qsa(VOICE_CMDS_QUERY);
-    let cmds = [];//"Well", "Hey there"], ["booo", ["!shovel fulla shit sir"]]];
+    let cmds = [];
     for (let sel of sels) {
         let val = sel.value;
         if (val !== "!") cmds.push([val.substring(1), val]);
@@ -64,9 +69,7 @@ function on_voice_command_change(e) {
     voiceCmdSelect.replace_options(cmds);
     voiceCmdSelect.add("", "Use voice", {}, 0);
     voiceCmdSelect.select_val("");
-
-    //create_commands_voice_map();
-}
+ }
 
 
     /**
@@ -97,15 +100,7 @@ export function add_form_element_listeners (events = FORM_EVENT_HANDLERS_INITIAL
         let fs = qsa(ev.selector);
         for (const f of fs) {
             f.addEventListener(ev.event, ev.function);
-                // LAZY, dangerous, might change this to params having triggers
-            /*
-            if (ev.event === 'change' && ev.params?.noAutoChange !== true) {
-                f.dispatchEvent(chEv);
-            } else
-            if (ev.event === 'input' && ev.params?.noAutoChange !== true) {
-                f.dispatchEvent(inpEv);
-            }
-            */
+             // GONE - automatic change and input triggers
         }
     }
 }
@@ -114,4 +109,17 @@ export function add_form_element_listeners (events = FORM_EVENT_HANDLERS_INITIAL
 
 function on_slider_input(e) {
     gid(e.target.dataset.for).innerText = e.target.value;
+}
+
+function on_test_btn_click(e) {
+    let idx = e.target.dataset["index"];
+    let rate = gid("r"+idx).value;
+    let pitch = gid("p"+idx).value;
+    let vHash = gid("v"+idx).value;
+    let voice = hashToVoiceMap.get(vHash);
+
+    let pack = {immediate:true, message: TEST_MESSAGE, voicepack: {rate, pitch, voice}};
+
+    console.log("PACK TO TEST", pack);
+    speech.speak(pack);
 }

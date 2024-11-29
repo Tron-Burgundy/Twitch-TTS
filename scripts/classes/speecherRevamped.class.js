@@ -78,10 +78,16 @@ export default class SpeecherRevamped {
         this.stopNow = false;
         let msgId = pack.messageid ?? this.speechQueueIdBackup++;
 
-        if (pack.saynext) {
+
+        if (pack.saynext || pack.immediate) {
             this.speechQueueMap = new Map( [ [msgId, pack], ...this.speechQueueMap ] );
         } else {
             this.speechQueueMap.set(msgId, pack);
+        }
+
+
+        if (pack.immediate) {
+            this.cancel();
         }
 
         SPEECHER_log("Speech Queue", this.speechQueueMap.size);

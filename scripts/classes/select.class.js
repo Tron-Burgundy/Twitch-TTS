@@ -18,28 +18,35 @@ let dce = x => document.createElement(x);
 
 export default class Select {
 
-    #id = null;  // html id of the element
+    //#id = null;  // html id of the element
     #selectNode = null;
 
     staySelected = true;    // if the entries change keep the selected value
 
-    sortByText = false;      //
-    sortByValues = false;   //
+    sortByText = false;
+    sortByValues = false;
 
         // any events that might be tied to the select
     events = [];
 
         /**
          *
-         * @param {string obj, HTMLSelectNode} id
+         * @param {string idOrSelect, HTMLSelectNode} id
          */
 
-    constructor(obj = null) {
-        if (obj.constructor === HTMLSelectElement) {
-            this.#selectNode = obj;
+    constructor(idOrSelect = null) {
+        if (idOrSelect.constructor === HTMLSelectElement) {
+            this.#selectNode = idOrSelect;
         }   // assume a string
-        else if (obj !== null) {
-            this.id = obj;   // setter creates the select element
+        else if (typeof idOrSelect === "string") {
+            let selNode = gid(idOrSelect);
+
+            if (selNode) {
+                this.#selectNode = selNode;
+            } else {
+                this.create_select();
+                this.#selectNode.id = idOrSelect;
+            }
         }
     }
 
@@ -49,11 +56,12 @@ export default class Select {
          */
 
     set id(val) {
+        this.#selectNode.id = val;
+    }
+/*
+    set id(val) {
         let selNode = gid(val);
-        //console.log("SETTING select id to ", val, selNode);
-
-            // check if selNode's constructor is HTMLSelectElement
-            // adopt what the id points to
+            // check if selNode's constructor is HTMLSelectElement or adopt what the id points to
         if (selNode) {
             if (selNode.constructor !== HTMLSelectElement) {
                 console.warn(`Select class WARNING: The element with the id "${val}" is not a select element.  It is ${selNode.constructor}`)
@@ -69,31 +77,31 @@ export default class Select {
             this.#selectNode.id = val;
             this.#id = val;
         }
-    }
+    } */
 
     get id() {
-        return this.#id;
+        return this.#selectNode.id;
     }
 
-
-    // select by index, select by text?
 
         // set to a selected value
     select_val(val) {
-        let opts = this.#selectNode?.options ?? gid(this.#id)?.options ?? null;
+        // let opts = this.#selectNode?.options ?? gid(this.#id)?.options ?? null;
+        let opts = this.#selectNode?.options ?? null;
 
         if (!opts) return false;
 
         this.#selectNode.value = val;
 
-        if (val === this.get_val()) return true;
+        if (val == this.get_val()) return true;
 
         return false;
     }
 
         // get selected value
     get_val(value = null) {
-        let select = this.#selectNode ?? gid(this.#id) ?? null;
+        // let select = this.#selectNode ?? gid(this.#id) ?? null;
+        let select = this.#selectNode ?? null;
         let selectVal = select?.selectedIndex >= 0 ? select.options[select.selectedIndex].value : null;
         return selectVal;
     }
@@ -103,7 +111,8 @@ export default class Select {
 
 
     has_val(value) {
-        let select = this.#selectNode ?? gid(this.#id) ?? null;
+        // let select = this.#selectNode ?? gid(this.#id) ?? null;
+        let select = this.#selectNode ?? null;
         if (select === null) return false;
         for (let opt of select.options) {
             if (opt.value === value)
@@ -114,7 +123,8 @@ export default class Select {
 
     // get selected text
     get_text = function get_select_text() {
-        let select = this.#selectNode ?? gid(this.#id) ?? null;
+        // let select = this.#selectNode ?? gid(this.#id) ?? null;
+        let select = this.#selectNode ?? null;
         return select?.selectedIndex >= 0 ? select.options[select.selectedIndex].text : null;
     }
 
@@ -132,11 +142,11 @@ export default class Select {
         /**
          * Creates a html select
          * @param {Array, Object, Map} optsData
-         * @param {boolean} noReplace whether to replace our selectNode with the newly created select
+         * @param {boolean} replaceThisSelect whether to replace our selectNode with the newly created select
          * @returns HTMLSelectElement
          */
 
-    create_select(optsData = [], noReplace = false) {
+    create_select(optsData = [], replaceThisSelect = true) {
         /* if (!this.#id.toString().length) {
             console.error("ERROR: Can't create a select with no id");
             toast("Set an id for the select first", "is-error", 8000);
@@ -151,7 +161,7 @@ export default class Select {
             sel.replaceChildren(...opts);
         }
 
-        if (noReplace === false) this.#selectNode = sel;
+        if (replaceThisSelect === true) this.#selectNode = sel;
 
         return sel;
     }
@@ -164,8 +174,8 @@ export default class Select {
 
     replace_options(optsData) {
         if (!this.#selectNode) {
-            toast("Can't replace options on select with id: " + this.#id, "is-danger", 8000);
-            console.error("ERROR replace_options error on select with id: " + this.#id);
+            toast("Can't replace options on select.  The node is empty: ", "is-danger", 8000);
+            console.error("ERROR replace_options error on select. #selNode: " + this.#selectNode);
             return false;
         }
             // selected may carry over
@@ -189,8 +199,7 @@ export default class Select {
          */
 
     create_option_set(optsData = []) {
-        //console.log("Create options received:", options);
-        // ensure opts is [[key,val], [key,val], [key,val]]
+
         if (Array.isArray(optsData)) {  // if single values, not pairs then create pairs
             optsData = [...optsData] ; // create a copy so we don't affect the passed array
 
@@ -316,7 +325,7 @@ export default class Select {
 
         // last param moonlights it to remove by text
     remove_by_value(val, limit = null, byText = false) {
-        let removed = 0;
+        let removedCount = 0;
 
         let options = this.options_validate();
 
@@ -332,7 +341,7 @@ export default class Select {
 
             if (compare === val) {
                 opt.remove();   // hopefully won't cause issues
-                removed++;
+                removedCount++;
                     // if an entry has been pulled under us reduce the selected index
                     // selected index goes to zero when the option is removed
                 if (index < selectedIndex) selectedIndex--;
@@ -345,7 +354,7 @@ export default class Select {
         let optsLen = this.#selectNode.options.length;
         this.#selectNode.selectedIndex = selectedIndex >= optsLen ? optsLen -1 : selectedIndex;
 
-        return removed;
+        return removedCount;
     }
 
     remove_by_text(text, limit) {
@@ -353,7 +362,7 @@ export default class Select {
     }
 
         /**
-         *  Returns valid options for a select element, select options, a select id or this classes select
+         *  Returns valid options for a select element, select options, a string id that is a select, or this classes select
          * @param {any} value to compare
          * @param {select element, options collection, id of a select or null} options options to search through, default = use ours
          */

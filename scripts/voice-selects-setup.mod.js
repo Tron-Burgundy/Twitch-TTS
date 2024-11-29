@@ -17,9 +17,10 @@ import EVENTS from "./event-constants.mod.js";
 import { speech } from "./main.mod.js";
 import { VOICE_CMDS_QUERY } from "./config.mod.js";
 
-const hashToVoiceMap = new Map();
+export const hashToVoiceMap = new Map();
 const hashToVoiceNameMap = new Map();
-    // the select used to choose a custom voice
+
+    // the select used above tag pools to choose a custom voice
 export const voiceCmdSelect = new Select("voicecommand");
 voiceCmdSelect.sortByText = true;
 
@@ -31,7 +32,7 @@ window.addEventListener("load", voice_selects_main);
 
     // things just look prettier in functions rather than just dumped in the 'flow'
 
-var initialised = false
+var initialised = false;
 
 async function voice_selects_main() {
     if (initialised) return; initialised = true;
@@ -88,6 +89,7 @@ export function create_commands_voice_map() {
      */
 
 export function populate_voice_selects() {
+    cclog("VOICES CHANGED - VOICES CHANGED - VOICES CHANGED", "y");
     // get the selects
     let selects = qsa(".voice-select");
     let filters = qsa(".voice-filter");

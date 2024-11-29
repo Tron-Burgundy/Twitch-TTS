@@ -12,12 +12,13 @@ export function stop_go_icon_off() {
     icon.dataset["icon"] = "power-off";
     icon = gid("stopgobtn");
     icon.classList.remove(ICON_ON_CLASS);
-    icon.classList.add(ICON_OFF_CLASS); console.log("PISS");
+    icon.classList.add(ICON_OFF_CLASS);
 }
+
 export function stop_go_icon_on() {
     let icon = gid("stopgoicon");
     icon.dataset["icon"] = "power-off";
     let btn = gid("stopgobtn");
     btn.classList.remove(ICON_OFF_CLASS);
-    btn.classList.add(ICON_ON_CLASS); console.log("FLAPS");
+    btn.classList.add(ICON_ON_CLASS);
 }

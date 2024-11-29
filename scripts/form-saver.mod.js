@@ -87,8 +87,6 @@ export function restore_form_values(selector = '.form-save', opts)
 	let optsGroup = {...FORM_RESTORE_CONFIG, ...opts}
 
 	let { paramString, localStorageFallback } = optsGroup;
-	 console.log("Got Opts", optsGroup);
-
 
 	if (!paramString && localStorageFallback) {
 		 paramString = localstore_load();

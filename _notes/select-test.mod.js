@@ -4,21 +4,18 @@ import Select from "../scripts/classes/select.class.js";
 window.s1 = new Select("sel1");
 window.s2 = new Select("sel2");
 window.s3 = new Select("sel3");
-
+window.Select = Select;
 
 window.addEventListener("load", x => {
     document.title = "Select Tester";
 
     s2.staySelected = false;
 
-    revert();
-
-
-
+    _revert();
 });
 
 
-window.revert = () => {
+window._revert = () => {
     s1.replace_options({
         1: "steak and kidney 1",
         2: "Skinny ones 2",
@@ -34,13 +31,13 @@ window.revert = () => {
 
 }
 
-window.add = () => {
+window._add = () => {
     s1.add(4, "option 4", {}, 0);
     s2.add(4, "Another option ", {}, 0);
 }
 
 
-window.replace = () => {
+window._replace = () => {
     s1.replace_options({
         1: "Mutton chips 1",
         2: "Ground pulver 2",

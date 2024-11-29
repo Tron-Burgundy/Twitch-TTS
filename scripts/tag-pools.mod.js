@@ -1,21 +1,7 @@
 /* tags have CAP CASED data-user
 
-SHOULD delete button :
-
-    1. do the delete fn which called EVENTS.USER_IGNORED or "user:unignored"
-        THEN IT EMITS
-
-    2. button emits
-        THIS HAS HANDLER
-
-    I like the idea of the simple emit
-
-How will these modify the underlying code?
-
-e.g the nickname tagpool.
-
-Nickname has an underlying hidden form field
-FlipThatNoise(Shit.That.Bed)Drunkula(piss.WEASEL!)DrUnkUla(Bed    wettting      tit    face)
+ Nickname / autvoices have an associated hidden form field
+TheUserName(The~Nick~Name)OtherUser(Nikky)
 
 We want to preserve the case for this when saving even though the keys are lower case (caused by onchange)
 
