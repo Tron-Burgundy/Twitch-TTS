@@ -40,9 +40,6 @@
           </div>
         </div>
         <div class="box">
-          <div id="speechqueuesaying"><span class="tab is-info">Currently saying...</span></div>
-        </div>
-        <div class="box">
           <div id="mainoutput"></div>
           <p>speech queue</p>
           <div id="speechqueue"></div>
@@ -1097,6 +1094,10 @@
             </div>
           </div>
         </div>
+        <div class="box">
+          <button class="savecookieConf button is-link">save settings to cookie</button>
+          <button class="loadcookieConf button is-link">load settings from cookie</button>
+        </div>
       </div>
       <div class="tab-pane">
         <!--// IGNORED / ALLOWED PANE ////-->
@@ -1330,7 +1331,7 @@
               <label class="label">Filter characters</label>
               <div class="field">
                 <div class="control">
-                  <input class="input Xform-save" id="stripchars" type="text" value="\/#_()€¥¢©®™~¿[]{}&lt;&gt;¡`;÷|¦¬×§¶°" data-to="chatFilterChars" data-type="str">
+                  <input class="input form-save" id="stripchars" type="text" value="\/€¥¢©®™~¿¡`;÷|¦¬×§¶°" data-to="chatFilterChars" data-type="str">
                 </div>
               </div>
               <div class="columns is-mobile">
@@ -1373,15 +1374,18 @@
     </div>
     <div class="modal" id="saveWarning">
       <div class="modal-background modal-dismiss"></div>
-      <div class="modal-content modal-dismiss">
-        <div class="box">
-          <button class="delete is-pulled-right" data-target="#saveWarning" aria-label="close"></button>
-          <div class="title">BOOKMARK THE PAGE</div>
-          <div class="subtitle">if you want to save your changes.</div>
-          <div class="mb-5"></div>
-          <div class="title">Already left the site?</div>
-          <div class="subtitle">press back to restore the changes</div>
-        </div>
+      <div class="modal-content box">
+        <button class="delete is-pulled-right" data-target="#saveWarning" aria-label="close"></button>
+        <div class="title">BOOKMARK THE PAGE</div>
+        <div class="subtitle">if you want to save your changes.</div>
+        <div class="mb-5"></div>
+        <div class="title">Already left the site?</div>
+        <div class="subtitle">press back to restore the changes</div>
+        <div class="mb-5"></div>
+        <div class="subtitle">You can also save the settings to a cookie and load them manually.</div>
+        <div class="subtitle">I'd still bookmark the url as cookies sometimes go missing.</div>
+        <button class="savecookie button is-link">Save settings cookie</button>
+        <button class="button is-warning modal-dismiss">Close</button>
       </div>
       <button class="modal-close is-large"></button>
     </div>

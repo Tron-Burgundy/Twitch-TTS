@@ -59,22 +59,27 @@ function init_modals() {
         btn.addEventListener('click', x => show_modal(modal));
     })
         // attach close events to all the kids
-    modals.forEach((modal) => {	// normally I dismiss on .modal-background but let's allow choice
+    // modals.forEach((modal) => {	// normally I dismiss on .modal-background but let's allow choice
+    for( let modal of modals) {	// normally I dismiss on .modal-background but let's allow choice
+
         let addClose = modal.querySelectorAll('.modal-dismiss, .modal-close, .modal-card-head .delete');
 
-        addClose.forEach(closeMe => {
-            closeMe.addEventListener('click', () => {modal.classList.remove('is-active'); html.classList.remove('is-clipped');})
-        })
-    });
+        for(let closer of addClose) {
+            console.log("adding close for ", modal.id);
+            closer.addEventListener("click", x => hide_modal(modal.id))
+        }
+    };
 }
 
 function show_modal(id) {
+    // console.log("DO SHOW FOR", id);
     let modal = gid(id);
     modal.classList.add('is-active');
     html.classList.add('is-clipped');	// stops background scrolling with mouse
 }
 
 function hide_modal(id) {
+    // console.log("DO HIDE FOR", id);
     let modal = gid(id);
     modal.classList.remove('is-active');
     html.classList.remove('is-clipped');	// stops background scrolling with mouse
@@ -263,7 +268,7 @@ TT.button_add_confirmed_func = function (query, func, seconds = 3, text = "Confi
 
         btn.onclick = async (e) => {
             if (confirmCountdownUnderway) {	// carry out the callback if we're in the countdown
-                func();
+                func(e);
                 resetBtn();
                 return;
             }

@@ -98,6 +98,8 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
 
         // convert atted names
     pack.message = atted_names_convert(pack.message);
+    if (TT.config.chatFilterChars.length)
+        pack.message = pack.message.replace(TT.charFilterRegex, ' ');
 
     if (TT.config.chatNoNameRepeatSeconds === 0 || TT.lastUser !== userid ||
         messageTime - TT.lastMessageTime >= TT.config.chatNoNameRepeatSeconds * 1000 ||  channel !== TT.lastChannel) {        // dressup message
@@ -187,10 +189,10 @@ function add_general_events() {
 }
 
 function add_speecher_events() {
-    TT.emitter.on("speecher:cancelled", on_speech_cancelled);
-    TT.emitter.on("speecher:error", on_speech_error);
-    TT.emitter.on("speecher:start", on_speech_started);
-    TT.emitter.on("speecher:end", on_speech_ended);
+    TT.emitter.on(EVENTS.SPEECHER_CANCELLED, on_speech_cancelled);
+    TT.emitter.on(EVENTS.SPEECHER_ERROR, on_speech_error);
+    TT.emitter.on(EVENTS.SPEECHER_START, on_speech_started);
+    TT.emitter.on(EVENTS.SPEECHER_END, on_speech_ended);
 
     // having prune on before speak means it can allow one extra in
 
@@ -199,8 +201,9 @@ function add_speecher_events() {
             msgDisp.speech_queue_old_prune(TT.config.speechQueueOldLimit -1);
 
         let ut = e.detail.utterance;
-            // check if the utterance had the voice command added or if the user has one
+            // !vcmd can be in the custom data or use the user's assigned one
         let autoVoiceCmd = ut.customdata.voiceCmd || TT.config.userAutoVoices[ut.customdata.userLower];
+            // customdata.voicepack {p,r,v} OR voice command from above !voice OR default
         let voicePack = ut.customdata.voicepack || TT.config.autoVoiceMap[autoVoiceCmd] || TT.config.autoVoiceMap[undefined];
 
             // I used to clamp this but fuck it.
@@ -216,12 +219,16 @@ function add_speecher_events() {
 
 function on_speech_started(e) {
     //console.log("STARTED", e.detail);
-    //msgDisp.speaking_start(e);
+
+//    gid("speechqueuesaying").innerHTML = '<span class="tag is-info">Saying: </span> : ' + e.detail.utterance.customdata.message;
+
+    //end: e => { gid("speechqueuesaying").innerText = "Idle..."; },
 }
 
 function on_speech_ended(e) {
     //console.log("ENDED", e.detail);
     msgDisp.speech_queue_entry_to_old_messages(e.detail.messageid, "ended", "link");
+//    gid("speechqueuesaying").innerText = "Idle...";
 }
 
 function on_speech_error(e) {

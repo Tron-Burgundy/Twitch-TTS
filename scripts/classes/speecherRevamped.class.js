@@ -279,8 +279,8 @@ export default class SpeecherRevamped {
 
 
     add_event_listeners() {
-        TT.emitter.on("speecher:end", x => this.sayQueueProcess());
-        TT.emitter.on("speecher:error", x => this.sayQueueProcess());
+        TT.emitter.on(EVENTS.SPEECHER_END, x => this.sayQueueProcess());
+        TT.emitter.on(EVENTS.SPEECHER_ERROR, x => this.sayQueueProcess());
     }
 
 

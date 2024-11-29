@@ -29,7 +29,7 @@ const FORM_RESTORE_VERBOSE = false;
 	* @returns
 	*/
 
-function query_string_from_inputs(selectors = '.form-save') {
+export function query_string_from_inputs(selectors = '.form-save') {
 	let inputs = document.querySelectorAll(selectors);
 	let uri = [];
 
@@ -202,11 +202,21 @@ function get_query_string_params(params = window.location.search) {
 	return getVars;
 }
 
-	/**
-	 *
-	 */
 
- export function url_populate() {
+
+/**
+ *	Shoves the url into the address bar and saves it to localstorage
+ *  Because this is called 150+ times if allchange() is triggered I'm adding a time trick
+ */
+let lastUrlPopTime = 0;
+
+export function url_populate(e) {
+		// sime time check to stop this being hammered
+	let t = performance.now();
+	if (t - lastUrlPopTime < 1000.0) return;
+	lastUrlPopTime = t;
+
+	console.log("url pop", e);
 	let urlParams = query_string_from_inputs();
 
 		// sets the value in localStorage to use in form values restore
