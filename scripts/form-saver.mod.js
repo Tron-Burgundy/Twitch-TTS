@@ -112,6 +112,8 @@ export function restore_form_values(selector = '.form-save', opts)
 
 		if ( !(name in getVars) ) {
 			if (FORM_RESTORE_VERBOSE) console.warning("restore_form_values : field has no url match : ", name)
+			// should use field default
+			field.value = field.defaultValue ?? "";
 			continue;
 		}
 
@@ -244,7 +246,7 @@ export function url_populate(e) {
 
 		history.replaceState({}, null, url);
 
-		if (TT.queryStringOnLoad !== window.location.search) {
+		if (TT.queryStringOnLoad !== urlParams) {
 			TT.emit(EVENTS.QUERY_PARAMS_CHANGED)
 		} else {
 			TT.emit(EVENTS.QUERY_PARAMS_UNCHANGED)

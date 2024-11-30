@@ -149,43 +149,46 @@ function save_params_cookie(e) {
     console.log("EEE", e);
     e.stopPropagation();
     setCookie("URLPARAMS", query_string_from_inputs());
-    toast("Saved settings to a cookie", "is-link");
+    toast("Saved settings cookie", "is-link");
 }
 
 function load_params_cookie() {
     let paramString = getCookie("URLPARAMS");
+        // the problem here is that all values not stored in the string will stay at their current values
+        // could set all the defaults first
     restore_form_values('.form-save', {paramString});
     TT.allchange(); // man alive this is going to lag
     create_tag_pools();
-    toast("Loaded settings from a cookie", "is-link");
+    toast("Loaded cookie settings", "is-link");
 }
 
 
 
 
     // great to see the most found get and set cookie funcs on the net are bad
-const repIt = "¼Æþ";
+    // I did a url encode of name and value, now let's cheapen that with a replace
+
+const repColonSpace = "¼Æþ";    // replaces "; " in names and values
 function setCookie(cName, cValue, expDays = 1000) {
     let date = new Date();
     date.setTime(date.getTime() + (expDays * 86400 * 1000));
     const expires = "expires=" + date.toUTCString();
     // document.cookie = encodeURIComponent(cName) + "=" + encodeURIComponent(cValue) + "; " + expires + "; path=/";
-    document.cookie = cName.replace("; ", repIt) + "=" + cValue.replace("; ", repIt) + "; " + expires + "; path=/";
+    document.cookie = cName.replace("; ", repColonSpace) + "=" + cValue.replace("; ", repColonSpace) + "; " + expires + "; path=/";
 }
 
     // returns undefined if not found
 
 function getCookie(cName) {
-    const cArr = document.cookie.split('; ');
+    cName = cName.replace("; ", repColonSpace);
 
-    cName = cName.replace("; ", repIt);
-    for (let val of cArr) {
-        let [n, v] = val.split("=", 1);
-        v = val.substring(n.length + 1);
+    const eqPairs = document.cookie.split("; ");
 
-        if (n === cName) {
-            //return decodeURIComponent(v);
-            return v.replace(repIt, "; ");
+    for (let val of eqPairs) {
+        let n = val.split("=", 1)[0];
+
+        if (n === cName) {            //return decodeURIComponent(v);
+            return val.substring(n.length + 1).replace(repColonSpace, "; ");
         }
     }
 
