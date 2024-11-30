@@ -205,32 +205,51 @@ function get_query_string_params(params = window.location.search) {
 
 
 /**
- *	Shoves the url into the address bar and saves it to localstorage
- *  Because this is called 150+ times if allchange() is triggered I'm adding a time trick
+ * Shoves the url into the address bar and saves it to localstorage
+ * Because this is called 150+ times if allchange() is triggered I'm putting measures in place
+ * I did a setTimeout before but it wasn't the problem.  One of my out filters for voices commands was
+ * This was getting called during the repopulation of form fields before ! was added to commands and then
+ * they were just being blindly stripped of the first character
  */
-let lastUrlPopTime = 0;
+
+let urlPopTimeoutActive = false;
 
 export function url_populate(e) {
 		// sime time check to stop this being hammered
-	let t = performance.now();
-	if (t - lastUrlPopTime < 1000.0) return;
-	lastUrlPopTime = t;
+/* 	if (urlPopTimeoutActive === true) return;
+	urlPopTimeoutActive = true; */
 
-	console.log("url pop", e);
-	let urlParams = query_string_from_inputs();
+	// setTimeout(x => {
+		let urlParams = query_string_from_inputs();
 
-		// sets the value in localStorage to use in form values restore
-	localstore_save(urlParams);
-	let url = window.location.origin + window.location.pathname + '?' + urlParams;
+		urlParams = "?" + urlParams;
 
-	history.replaceState({}, null, url);
+		if (window.location.search === urlParams) {//cclog("NO NEEDS", "g");
+			return;
+		}
 
-	if (TT.queryStringOnLoad !== window.location.search) {
-        TT.emit(EVENTS.QUERY_PARAMS_CHANGED)
-    } else {
-        TT.emit(EVENTS.QUERY_PARAMS_UNCHANGED)
-	}
-		// fill the link box
-	//let urlBox = gid('linkurl');
-	//if (urlBox) urlBox.value = url;
+		cclog("URL repopulated", "y");
+		// console.log("url pop", e.target);
+		// console.log("search len, params len", window.location.search.length, urlParams.trim().length);
+		// console.log("w/u:");
+		// cclog("'" + window.location.search + "'");
+		// console.log("\n\n");
+		// console.log("'" + urlParams + "'");
+		// console.log("w/u:", window.location.search, "\n\n", urlParams);
+
+			// sets the value in localStorage to use in form values restore
+		localstore_save(urlParams);
+		// let url = window.location.origin + window.location.pathname + urlParams;
+		let url = window.location.origin + window.location.pathname + urlParams;
+
+		history.replaceState({}, null, url);
+
+		if (TT.queryStringOnLoad !== window.location.search) {
+			TT.emit(EVENTS.QUERY_PARAMS_CHANGED)
+		} else {
+			TT.emit(EVENTS.QUERY_PARAMS_UNCHANGED)
+		}
+
+		urlPopTimeoutActive = false;
+	// }, 500);
 }

@@ -54,10 +54,11 @@ function init_modals() {
     let modals = [...document.getElementsByClassName('modal')];	// and arrays allow forEach, too.
 
         // get modal ids from the data-target of buttons
-    triggers.forEach( btn => {
+    // triggers.forEach( btn => {
+    for (let btn of triggers) {
         let modal = btn.dataset.target;
         btn.addEventListener('click', x => show_modal(modal));
-    })
+    };
         // attach close events to all the kids
     // modals.forEach((modal) => {	// normally I dismiss on .modal-background but let's allow choice
     for( let modal of modals) {	// normally I dismiss on .modal-background but let's allow choice
@@ -72,14 +73,14 @@ function init_modals() {
 }
 
 function show_modal(id) {
-    // console.log("DO SHOW FOR", id);
+    console.log("DO SHOW FOR", id);// EDGE sometimes stops doing the click but if I do this it's fine
     let modal = gid(id);
     modal.classList.add('is-active');
     html.classList.add('is-clipped');	// stops background scrolling with mouse
 }
 
 function hide_modal(id) {
-    // console.log("DO HIDE FOR", id);
+    console.log("DO HIDE FOR", id);
     let modal = gid(id);
     modal.classList.remove('is-active');
     html.classList.remove('is-clipped');	// stops background scrolling with mouse

@@ -34,13 +34,20 @@ export const FORM_IN_OUT_FILTERS = { // apply to keys or elements?
     pitchNrate: {
         out: e => e === "1" ? null : e
     },
-
+        // sometimes this processes values before the "!" has been added
     vcmd: { // turn "I'm bAdly done" -> i_m_badly_done and if it's empty then return null
-        out: e => {e = e.substring(1).replace(/\W/g, " ").trim().replace(/ /g, "_").toLowerCase(); return e.length ? e : null}
+        out: x => {//console.log("vmd out has", x);
+            x = x
+                // .replace(/^!./, "")
+                .replace(/\W+/g, " ")
+                .trim()
+                .replace(" ", "_")
+                .toLowerCase();
+            return x.length ? x : null}
     },
 
     vselect: {
-        out: e => e.length ? e : null
+        out: x => x.length ? x : null
     },
 
 
