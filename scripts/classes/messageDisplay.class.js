@@ -91,7 +91,7 @@ export default class TTSMsgDisplay
         let nid = gid(TTS_MSG_ID_PREFIX + id);
 
         if (!nid) {
-            console.log("*** ERROR: no speech queue entry with ID : "+id);
+            //console.log("*** ERROR: no speech queue entry with ID : "+id);
             return false;
         }
             // insert a div

@@ -137,7 +137,7 @@ function on_voice_test_btn_click(e) {
     let voice = hashToVoiceMap.get(vHash);
 
     let pack = {immediate:true, message: TEST_MESSAGE, voicepack: {rate, pitch, voice}};
-
+        // all data in the pack becomes utterance customdata
     speech.speak(pack);
 }
 

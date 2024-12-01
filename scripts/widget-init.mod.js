@@ -66,7 +66,7 @@ function init_modals() {
         let addClose = modal.querySelectorAll('.modal-dismiss, .modal-close, .modal-card-head .delete');
 
         for(let closer of addClose) {
-            console.log("adding close for ", modal.id);
+            // console.log("adding close for ", modal.id);
             closer.addEventListener("click", x => hide_modal(modal.id))
         }
     };
@@ -105,7 +105,7 @@ function init_tabs() {
     tts_log("Tab groups: ", tabGroups);
 
     for( let group in tabGroups ) {
-        tts_log('group:', group);
+        // tts_log('group:', group);
             // go over each set adding a click - the click also has to reiterate over the groups
         let tabGroup = tabGroups[group].tabsets;
         let paneSet = tabGroups[group].tabpanes;
