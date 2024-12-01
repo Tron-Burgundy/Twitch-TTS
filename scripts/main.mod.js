@@ -6,6 +6,8 @@
 window.TT = window.TT ?? {};
 
 import Emitter from "./classes/emitter.class.js"
+import "./widget-init.mod.js";
+import "./tmi/twitch-message-distributor.mod.js";
 import TTSMsgDisplay from "./classes/messageDisplay.class.js"
 import SpeecherRevamped from "./classes/speecherRevamped.class.js";
 import EVENTS from "./event-constants.mod.js";
@@ -39,7 +41,7 @@ window.addEventListener("load", async function main() {
 
     add_speecher_events();
     add_general_events();
-    add_moderation_events();
+    add_twitch_moderation_events();
 
     await speech.ready();
 
@@ -58,7 +60,6 @@ window.addEventListener("load", async function main() {
     add_form_element_listeners(FORM_EVENT_HANDLERS_POST);
 
     create_commands_voice_map();
-
 
     stupid_test_guff(); // WARNING: takes out anything starting with X
 
@@ -179,6 +180,7 @@ function add_general_events() {
     TT.emitter.on(EVENTS.TWITCH_MESSAGE, on_twitch_message);
     TT.emitter.on(EVENTS.USER_IGNORED, on_user_ignored);
     TT.emitter.on(EVENTS.USER_UNIGNORED, on_user_unignored);
+    TT.emitter.on(EVENTS.MESSAGE_DELETED, on_message_deleted);
     TT.emitter.on(EVENTS.SPEECH_DISABLED, on_speech_disabled);
     TT.emitter.on(EVENTS.SPEECH_ENABLED, on_speech_enabled);
     TT.emitter.on(EVENTS.SPEECH_PAUSED, on_speech_paused);
@@ -253,7 +255,7 @@ function on_speech_cancelled(e) {
 }
 
 
-function add_moderation_events() {
+function add_twitch_moderation_events() {
     TT.emitter.on(EVENTS.TWITCH_MESSAGE_DELETED, e => {
         if (!TT.config.chatRemoveModerated) return;
         let {channel, username, deletedMessage, userstate, messageid} = e.detail;
@@ -330,6 +332,12 @@ function on_user_ignored(e) {
 
 function on_user_unignored(e) {
     msgDisp.unignore_user(e.detail.user);   // oh no you don't!
+}
+
+function on_message_deleted(e) {
+    console.log("cancelling id", e.detail.messageid);
+    speech.cancel_id(e.detail.messageid);
+    msgDisp.remove_msg(e.detail.messageid);   // oh no you don't!
 }
 
 function on_query_params_change(e) {
