@@ -39,6 +39,7 @@ window.addEventListener("load", async function main() {
 
     add_speecher_events();
     add_general_events();
+    add_moderation_events();
 
     await speech.ready();
 
@@ -176,7 +177,6 @@ function atted_names_convert(message) {
 
 function add_general_events() {
     TT.emitter.on(EVENTS.TWITCH_MESSAGE, on_twitch_message);
-    TT.emitter.on(EVENTS.MESSAGE_DELETED, on_message_deleted);
     TT.emitter.on(EVENTS.USER_IGNORED, on_user_ignored);
     TT.emitter.on(EVENTS.USER_UNIGNORED, on_user_unignored);
     TT.emitter.on(EVENTS.SPEECH_DISABLED, on_speech_disabled);
@@ -219,9 +219,7 @@ function add_speecher_events() {
 
 function on_speech_started(e) {
     //console.log("STARTED", e.detail);
-
 //    gid("speechqueuesaying").innerHTML = '<span class="tag is-info">Saying: </span> : ' + e.detail.utterance.customdata.message;
-
     //end: e => { gid("speechqueuesaying").innerText = "Idle..."; },
 }
 
@@ -254,11 +252,35 @@ function on_speech_cancelled(e) {
     msgDisp.speech_queue_entry_to_old_messages(e.detail.messageid, "Cancelled", "warning");
 }
 
-function on_message_deleted(e) {
-    console.log("cancelling id", e.detail.messageid);
-    speech.cancel_id(e.detail.messageid);
-    msgDisp.remove_msg(e.detail.messageid);   // oh no you don't!
+
+function add_moderation_events() {
+    TT.emitter.on(EVENTS.TWITCH_MESSAGE_DELETED, e => {
+        if (!TT.config.chatRemoveModerated) return;
+        let {channel, username, deletedMessage, userstate, messageid} = e.detail;
+        speech.cancel_id(messageid);
+        // msgDisp.remove_msg(messageid);  // this deletes it - I'd prefer to know
+        msgDisp.speech_queue_entry_to_old_messages(messageid, "modded", "warning");
+    });
+
+    TT.emitter.on(EVENTS.TWITCH_BANNED, e => {
+        let {channel, username, reason, userstate} = e.detail;
+        speech.cancel_user_messages(username);
+        msgDisp.user_messages_to_old(username, "banned", "danger");
+    });
+
+    TT.emitter.on(EVENTS.TWITCH_CHAT_CLEARED, e => {
+        let {channel, "room-id": roomid, "tmi-sent-ts": time} = e.detail;
+    });
+        // timeouts happen before a ban but with duraction undefined
+    TT.emitter.on(EVENTS.TWITCH_TIMEOUT, e => {
+        if (e.detail.duration === undefined) return; // it's a ban
+        let {channel, username, duration, userid, "room-id": roomid, "tmi-sent-ts": time} = e.detail;
+        speech.cancel_user_messages(username);
+        msgDisp.user_messages_to_old(username, "timeout", "warning");
+    });
 }
+
+
 
 function on_speech_disabled() {
     speech.clear();

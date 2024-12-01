@@ -14,26 +14,27 @@ import { hashToVoiceMap, voiceCmdSelect, create_commands_voice_map } from "./voi
 
 
 const FORM_EVENT_HANDLERS_INITIAL = [
+    {selector: VOICE_CMDS_QUERY, event: 'change', function: on_voice_command_change, params: {}},
     {selector: '[data-to]', event: 'change', function: on_form_field_change, params: {}},
 
     {selector: '#channels', event: 'change', function: e => TT.join_chans(e.target.value), params: {}},
 
     {selector: "#playpausebtn, #pausespeech", event: "click", function: on_play_pause_click, params: {}},
     {selector: "#stopgobtn, #enablespeech", event: "click", function: on_stop_go_click, params: {}},
-//     {selector: '#loglabel', event: 'click', function: () => log('', true), params: {}},
-//         // any change in any .form-save value updates the url
-//         // it does get called like 120+ times on load, though
-    //{selector: '.form-save', event: 'change', function: url_populate, params: {}},
+
     {selector: 'input[type="range"]', event: 'input', function: on_slider_input, params: {}},
-    {selector: VOICE_CMDS_QUERY, event: 'change', function: on_voice_command_change, params: {}},
-
     {selector: "#stripchars", event: 'change', function: on_filter_chars_change, params: {}},
-
+        // voice test buttons
     {selector: "button[data-index]", event: 'click', function: on_voice_test_btn_click, params: {}},
-
+    // save button in the save warning modal
     {selector: ".savecookie", event: "click", function: save_params_cookie, params: {}},
-    //{selector: ".loadcookie", event: "click", function: load_params_cookie, params: {}},
+    //     {selector: '#loglabel', event: 'click', function: () => log('', true), params: {}},
 ];
+
+TT.button_add_confirmed_func(".savecookieConf", save_params_cookie, 3, "Confirm Save");
+TT.button_add_confirmed_func(".loadcookieConf", load_params_cookie, 3, "Confirm Load");
+
+    // handlers to add after restoring form values and allChange has been called
 
 export const FORM_EVENT_HANDLERS_POST = [
     {selector: '.form-save', event: 'change', function: url_populate, params: {}},
@@ -142,11 +143,9 @@ function on_voice_test_btn_click(e) {
 
 
 
-TT.button_add_confirmed_func(".savecookieConf", save_params_cookie, 3, "Confirm Save");
-TT.button_add_confirmed_func(".loadcookieConf", load_params_cookie, 3, "Confirm Load");
+
 
 function save_params_cookie(e) {
-    console.log("EEE", e);
     e.stopPropagation();
     setCookie("URLPARAMS", query_string_from_inputs());
     toast("Saved settings cookie", "is-link");
@@ -154,10 +153,10 @@ function save_params_cookie(e) {
 
 function load_params_cookie() {
     let paramString = getCookie("URLPARAMS");
-        // the problem here is that all values not stored in the string will stay at their current values
-        // could set all the defaults first
+        // the problem here is that all values not stored in the params will stay at their current values
+        // could set all the defaults first - it's sorted, all fields go to defaultValue or ""
     restore_form_values('.form-save', {paramString});
-    TT.allchange(); // man alive this is going to lag
+    TT.allchange(); // man alive this is going to lag - not any more it ain't
     create_tag_pools();
     toast("Loaded cookie settings", "is-link");
 }

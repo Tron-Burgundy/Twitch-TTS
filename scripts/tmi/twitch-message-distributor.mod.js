@@ -3,7 +3,7 @@
  * Received messages will be permission checked and emote filtered before the
  * decision to emit
  *
- * events: twitch:message twitch:ban twitch:messagedeleted twitch:tieout twitch:chatcleared twitch:notice
+ * events: twitch:message twitch:ban twitch:messagedeleted twitch:timeout twitch:chatcleared twitch:notice
  */
 import "./tmi.min.js"
 import { clientOpts } from "../config.mod.js"
@@ -97,25 +97,29 @@ tags:
 	target-user-id:"576952126"
 	tmi-sent-ts:"1731767348213"
 */
-	// if ( TTSVars.chatRemoveModerated &&  message.command === "CLEARCHAT" && message.params.length > 1) {
-	// 	message_twitch_ban_handler(message.params[0], message.params[1], null, null);
-	// }
 
 
 function message_twitch_raw_clearchat_handler(clone, message) {
-	if (message.command === "PONG" || message.command === "PING") return;
-	//console.log("RAW RAW MESSAGE", message );
+	//if (message.command === "PONG" || message.command === "PING") return;	//console.log("RAW RAW MESSAGE", message );
 
 		// 1 param = whole room, 2 = single user
 
 	if (message.command === "CLEARCHAT") {// && message.params.length > 1) {
 		if (message.params.length === 1) {
-			TT.emit(EVENTS.TWITCH_CHAT_CLEARED, { message });
+			let msg = {channel: message.params[0], "room-id": message.tags["room-id"], "tmi-sent-ts": message.tags["tmi-sent-ts"]}
+			TT.emit(EVENTS.TWITCH_CHAT_CLEARED, msg);
+			return;
 		}
 
 		if (message.params.length > 1) {
-			//message_twitch_ban_handler(message.params[0], message.params[1], null, message.tags);
-			TT.emit(EVENTS.TWITCH_TIMEOUT, { message });
+			let [channel, username] = message.params;
+			let msg = {
+				channel, username, userid: message.tags["target-user-id"],
+				duration: message.tags["ban-duration"], "room-id": message.tags["room-id"],
+				"tmi-sent-ts": message.tags["tmi-sent-ts"]
+			}
+			TT.emit(EVENTS.TWITCH_TIMEOUT, msg);
+			return;
 		}
 	}
 }
@@ -131,18 +135,8 @@ function message_twitch_ban_handler(channel, username, reason, userstate) {
 
 function message_twitch_msg_deleted_handler(channel, username, deletedMessage, userstate) {
 	TT.emit(EVENTS.TWITCH_MESSAGE_DELETED, {
-		channel, username, userstate, deletedMessage, messageid: userstate["target-msg-id"]
+		channel, username, deletedMessage, userstate, messageid: userstate["target-msg-id"]
 	});
-	// userstate has login for name, room-id, target-msg-id, and time
-	// if (!TTSVars.chatRemoveModerated) return;
-
-	// let speecherId = TTSVars.speech_queue_msgid_to_id(userstate["target-msg-id"]);
-	// //console.log("**** MESSAGE MODERATION", userstate, "to message id", speecherId);
-	// if (speecherId) {
-	// 	TTSVars.speecher.cancel_id(speecherId);
-	// 	TTSVars.speech_queue_entry_to_old_messages(speecherId, false);
-	// 	TTSVars.speech_queue_add_tag(speecherId, "moderated", "danger");
-	// }
 }
 
 

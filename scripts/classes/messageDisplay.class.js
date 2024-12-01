@@ -126,7 +126,6 @@ export default class TTSMsgDisplay
     }
 
     ignore_user(username) {
-        let sqUpcomingEntries = get_user_upcoming_msgs(username); // ban buttons have user and data-id
 
         let userIgnoreBtns = get_user_ignore_btns(username);	// for changing allows
 
@@ -137,9 +136,14 @@ export default class TTSMsgDisplay
             iBtn.classList.add(ALLOW_CLASS);
         }
             //speech_queue_entry_freeze(id);	// stop the entry from being removed by a speech end event
+        this.user_messages_to_old(username, "ignored", "success")
+    }
+
+    user_messages_to_old(username, tag, colour) {
+        let sqUpcomingEntries = get_user_upcoming_msgs(username); // ban buttons have user and data-id
         for (let upcomingEntry of sqUpcomingEntries) {	// only add tags to messages in main queue
             this.speech_queue_entry_to_old_messages(upcomingEntry.id);
-            speech_queue_add_tag(upcomingEntry.id, "ignored", 'success');
+            speech_queue_add_tag(upcomingEntry.id, tag, colour);
         }
     }
 
