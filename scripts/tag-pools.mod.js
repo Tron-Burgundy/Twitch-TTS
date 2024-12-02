@@ -43,31 +43,33 @@ export function init_tag_pools() {
 cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
         ///// ADD HANDLERS /////
     TT.emitter.on(EVENTS.USER_IGNORED, e => { //       console.log("IGNORED in pools", e);
-        delete_from_tag_pool(e.detail.user, "allownamed", false);
+        delete_from_tag_pool(e.detail.userLower, "allownamed", false);
     });
 
     TT.emitter.on(EVENTS.USER_UNALLOWED, e => {       console.log("unallowed in pools", e);
-        delete_from_tag_pool(e.detail.user, "allownamed", false);
+        delete_from_tag_pool(e.detail.userLower, "allownamed", false);
     });
 
     TT.emitter.on(EVENTS.USER_UNIGNORED, e => { //       console.log("UNIGNORED in POOLS", e);
-        delete_from_tag_pool(e.detail.user, "ignoredusers", false);
+        delete_from_tag_pool(e.detail.userLower, "ignoredusers", false);
     });
 
     TT.emitter.on(EVENTS.NICKNAME_ADDED, e => { //       console.log("nicknamedeleted in POOLS", e);
-        add_to_complex_pool(e.detail.user, e.detail.nickname, "nicknames");
+        console.log("NIC ADD", e.detail);
+        add_to_complex_pool(e.detail.userCaps, e.detail.nickname, "nicknames");
     });
 
     TT.emitter.on(EVENTS.NICKNAME_DELETED, e => { //       console.log("nicknamedeleted in POOLS", e);
-        delete_from_tag_pool(e.detail.user, "nicknames", true);
+        console.log("DELETED GOT", e.detail);
+        delete_from_tag_pool(e.detail.userLower, "nicknames", true);
     });
 
     TT.emitter.on(EVENTS.AUTOVOICE_ADDED, e => {//        console.log("autovoicedeleted in POOLS", e);
-        add_to_complex_pool(e.detail.user, e.detail.voice, "autovoices");
+        add_to_complex_pool(e.detail.userCaps, e.detail.voice, "autovoices");
     });
 
     TT.emitter.on(EVENTS.AUTOVOICE_DELETED, e => {//        console.log("autovoicedeleted in POOLS", e);
-        delete_from_tag_pool(e.detail.user, "autovoices", true);
+        delete_from_tag_pool(e.detail.userLower, "autovoices", true);
     });
 
     TT.emitter.on(EVENTS.USER_ALWAYS_ALLOWED, on_allow_user);
@@ -98,15 +100,17 @@ cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
     }
         // BUTTON ignore USERNAME CAPS, USER LOWER
     gid("ignoreuserbtn").addEventListener("click", x => {
-        let username = gid("username").value.trim();
-        let user = username.toLowerCase();
-        TT.emit(EVENTS.USER_IGNORED, {username, user });
-        TT.emit(EVENTS.USER_UNALLOWED, {username, user});
+        let userCaps = gid("username").value.trim();
+        let userLower = userCaps.toLowerCase();
+        TT.emit(EVENTS.USER_IGNORED, {userCaps, userLower });
+        TT.emit(EVENTS.USER_UNALLOWED, {userCaps, userLower});
     })
         // BUTTON Always Allow
     gid("alwaysallowuserbtn").addEventListener("click", x => {
-        TT.emit(EVENTS.USER_UNIGNORED, {user: gid("username").value.trim()});
-        TT.emit(EVENTS.USER_ALWAYS_ALLOWED, {user: gid("username").value.trim()});
+        let userCaps = gid("username").value.trim();
+        let userLower = userCaps.toLowerCase();
+        TT.emit(EVENTS.USER_UNIGNORED, {userCaps, userLower });
+        TT.emit(EVENTS.USER_ALWAYS_ALLOWED, {userCaps, userLower});
     })
         // pressing enter on text fields subs
     // gid("username").addEventListener("change", user_data_change);
@@ -135,30 +139,29 @@ cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
      */
 
 function user_data_change() {//console.log("CHAAAAAAAAAAAAAAAAAAANGE");
-    let user = to_username( gid("username").value );
+    let userCaps = to_username( gid("username").value );
 
-    gid("username").value = user;
+    gid("username").value = userCaps;
 
     let nickname    = gid("nickname").value.trim();
     let voice       = gid("voicecommand").value;
                                                             // console.log(user, nickname, voice);
+    if (!userCaps) return;
 
-    if (!user) return;
-
-    let userLC = user.toLowerCase()
+    let userLower = userCaps.toLowerCase()
 
     if (nickname.length) {
-        if (TT.config.nicknames[userLC] !== nickname)
-            TT.emit(EVENTS.NICKNAME_ADDED, {user, username: userLC, nickname});   // they'll have to work out if it's caps
-    } else if (TT.config.nicknames[userLC] !== undefined){
-        TT.emit(EVENTS.NICKNAME_DELETED, {user, username: userLC});
+        if (TT.config.nicknames[userLower] !== nickname)
+            TT.emit(EVENTS.NICKNAME_ADDED, {userCaps, userLower, nickname});   // they'll have to work out if it's caps
+    } else if (TT.config.nicknames[userLower] !== undefined){
+        TT.emit(EVENTS.NICKNAME_DELETED, {userCaps, userLower});
     }
 
     if (voice.length) {
-        if (TT.config.userAutoVoices[userLC] !== voice)
-            TT.emit(EVENTS.AUTOVOICE_ADDED, {user, username: userLC, voice});
-    } else if ( TT.config.userAutoVoices[userLC] ) {
-        TT.emit(EVENTS.AUTOVOICE_DELETED, {user, username: userLC});
+        if (TT.config.userAutoVoices[userLower] !== voice)
+            TT.emit(EVENTS.AUTOVOICE_ADDED, {userCaps, userLower, voice});
+    } else if ( TT.config.userAutoVoices[userLower] ) {
+        TT.emit(EVENTS.AUTOVOICE_DELETED, {userLower, userLower});
     }
 }
 
@@ -215,7 +218,7 @@ function on_tag_click(e) {
                 break;
             case HTMLSpanElement:
                 dataset = e.target.dataset;
-                user_things_populate(dataset.user);
+                user_things_populate(dataset.userCaps);
             break;
 
         default:
@@ -231,21 +234,19 @@ function on_tag_click(e) {
      */
 
 export function user_things_populate(user) {
-    let userLC = user.toLowerCase().trim();
+    let userLower = user.toLowerCase().trim();
+
+    let nickName = TT.config.nicknames[userLower] ?? "";
+    let vCmd = TT.config.userAutoVoices[userLower];
 
     let nameInput = gid("username");
     let nickInput = gid("nickname");
-    let voiceSelect = gid("voicecommand");
+    //let voiceSelect = gid("voicecommand");
 
     nameInput.value = user;
-
-    let nickName = TT.config.nicknames[userLC] ?? "";
     nickInput.value = nickName;
 
         // custom voice?
-
-    let vCmd = TT.config.userAutoVoices[userLC];
-
     if ( !voiceCmdSelect.select_val(vCmd) )
         !voiceCmdSelect.select_val("");
 }
@@ -278,12 +279,13 @@ function create_simple_tag_pool(poolId, inputFieldId) {
     //let users = split_on_space_replace(data);
 
     users.sort( (a,b) => a.localeCompare(b) );
-
+console.log("SIMPLE TAG POOL GOT", users);
     remove_children(pool);
 
     for ( let u of users ) {
         let tag = create_tag(u);
-        tag.dataset["user"] = u;
+        tag.dataset["userLower"] = u.toLowerCase();
+        tag.dataset["userCaps"] = u;
         tag.dataset["from"] = inputFieldId;
 
         let delBtn = create_tag_del_button();
@@ -308,13 +310,13 @@ function create_key_value_pool(poolId, inputFieldId, separator = ": ") {
     let pairObj = parse_key_value_string(data);
     let entries = Object.entries(pairObj).sort((a,b) => a[0].localeCompare(b[0]));
 
-    for (let [prop, value] of entries) {
+    for (let [userCaps, value] of entries) {
         //let value = pairObj[prop];
-        let text = prop + separator + value;
+        let text = userCaps + separator + value;
 
         let tag = create_tag(text);
-        tag.dataset["user"] = prop;
-        tag.dataset["key"] = prop;
+        tag.dataset["userLower"] = userCaps.toLowerCase();
+        tag.dataset["userCaps"] = userCaps;
         tag.dataset["value"] = value;
         tag.dataset["from"] = inputFieldId;
 
@@ -351,12 +353,12 @@ function create_tag_del_button(addClass="is-link") {
 
 function delete_from_tag_pool(user, inputSrcId, isKeyPairField = false) {
     let target = gid(inputSrcId);
-    let userLC =  to_username(user.toLowerCase());
+    let userLower =  to_username(user.toLowerCase());
 
     if (isKeyPairField) {  //console.log("IT IS COMPLAX", target.value);
-        del_from_key_value_field(inputSrcId, userLC);
+        del_from_key_value_field(inputSrcId, userLower);
     } else {
-        del_from_simple_field(inputSrcId, userLC);
+        del_from_simple_field(inputSrcId, userLower);
     }
 
     create_tag_pools();
@@ -386,9 +388,9 @@ function add_to_simple_pool(user, targetId) {
     create_tag_pools();
 }
 
-function add_to_complex_pool(user, value, targetId) {
-    user = to_username(user);
-    let userLower = user.toLowerCase();
+function add_to_complex_pool(userCaps, value, targetId) {
+    userCaps = to_username(userCaps);
+    let userLower = userCaps.toLowerCase();
     let field = gid(targetId);
     let currUsers = parse_key_value_string(field.value);
     //console.log("ADDING TO THIS THING,", currUsers);
@@ -403,7 +405,7 @@ function add_to_complex_pool(user, value, targetId) {
     }
 
     if (value.length)
-        currUsers[user] = value;
+        currUsers[userCaps] = value;
 
     field.value = to_key_value_string(currUsers);
     trigger_onchange(field);
@@ -411,11 +413,11 @@ function add_to_complex_pool(user, value, targetId) {
 }
 
 
-function del_from_key_value_field(inputSrcId, userLC) {
+function del_from_key_value_field(inputSrcId, userLower) {
     let target = gid(inputSrcId);
     let kvps = parse_key_value_string(target.value);
     for (let prop in kvps) {
-        if (prop.toLowerCase() === userLC) {
+        if (prop.toLowerCase() === userLower) {
             delete kvps[prop]; // deleted = true; break;
         }
     }
@@ -423,11 +425,11 @@ function del_from_key_value_field(inputSrcId, userLC) {
     trigger_onchange(target);
 }
 
-function del_from_simple_field(inputSrcId, userLC) {
+function del_from_simple_field(inputSrcId, userLower) {
     let target = gid(inputSrcId);
     let vals = split_to_array(target.value);
     // let vals = split_on_space_replace(target.value);
-    vals = vals.filter(x => x.toLowerCase() !== userLC);
+    vals = vals.filter(x => x.toLowerCase() !== userLower);
     target.value = vals.join(SPACE_REPLACE);
     trigger_onchange(target);
 }
@@ -440,11 +442,11 @@ function del_from_simple_field(inputSrcId, userLC) {
 
   // add user to always tag pool
 function on_allow_user(e) {
-    add_to_simple_pool(e.detail.user, "allownamed");
+    add_to_simple_pool(e.detail.userCaps, "allownamed");
 }
     // add user to ignored tag pool - username is capsed
 function on_ignore_user(e) {
-    add_to_simple_pool(e.detail.username, "ignoredusers");
+    add_to_simple_pool(e.detail.userCaps, "ignoredusers");
 }
 
 

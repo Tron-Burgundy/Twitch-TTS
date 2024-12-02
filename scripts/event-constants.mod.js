@@ -39,6 +39,7 @@ export const EVENTS = {
     SPEECH_RESUMED: "speech:resumed",
 
     MESSAGE_DELETED: "message:deleted",
+    MESSAGE_SKIPPED: "message:skipped",
 
     MESSAGE_ROW_CLICK: "message:rowclick",
 

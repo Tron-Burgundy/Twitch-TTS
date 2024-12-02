@@ -48,6 +48,19 @@
 	overflow: hidden;
 }
 
+#speechqueue .deletebtn {
+	display: none;
+}
+
+nav.skipped .speechQText {
+	text-decoration: line-through;
+}
+
+/* don't display skip buttons in the old messages*/
+#speechqueueold .skipbtn {
+	display: none;
+}
+
 @media only screen and (max-width: 600px) {
 	.speechQRow {
 		flex-wrap: wrap;

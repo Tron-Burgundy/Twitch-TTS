@@ -208,6 +208,7 @@ function add_general_events() {
     TT.emitter.on(EVENTS.USER_IGNORED, on_user_ignored);
     TT.emitter.on(EVENTS.USER_UNIGNORED, on_user_unignored);
     TT.emitter.on(EVENTS.MESSAGE_DELETED, on_message_deleted);
+    TT.emitter.on(EVENTS.MESSAGE_SKIPPED, on_message_skipped);
     TT.emitter.on(EVENTS.SPEECH_DISABLED, on_speech_disabled);
     TT.emitter.on(EVENTS.SPEECH_ENABLED, on_speech_enabled);
     TT.emitter.on(EVENTS.SPEECH_PAUSED, on_speech_paused);
@@ -260,19 +261,24 @@ function add_general_events() {
 
     function on_user_ignored(e) {
         console.log("IGNORED DATA", e);
-        let deleted = speech.cancel_user_messages(e.detail.user);
+        let deleted = speech.cancel_user_messages(e.detail.userLower);
         // toast("Deleted " + deleted + " messages for that bastard");
-        msgDisp.ignore_user(e.detail.user);   // oh no you don't!
+        msgDisp.ignore_user(e.detail.userLower);   // oh no you don't!
     }
 
     function on_user_unignored(e) {
-        msgDisp.unignore_user(e.detail.user);   // oh no you don't!
+        console.log("USER IGNORED", e.detail);
+        msgDisp.unignore_user(e.detail.userLower);   // oh no you don't!
     }
 
-    function on_message_deleted(e) {
-        console.log("cancelling id", e.detail.messageid);
-        speech.cancel_id(e.detail.messageid);
+    function on_message_deleted(e) { //console.log("deleting id", e.detail.messageid);
         msgDisp.remove_msg(e.detail.messageid);   // oh no you don't!
+        speech.cancel_id(e.detail.messageid);
+    }
+
+    function on_message_skipped(e) {//        console.log("skipping id", e.detail.messageid);
+        msgDisp.speech_queue_entry_to_old_messages(e.detail.messageid, "skipped", "link", "skipped"); // do before cancel
+        speech.cancel_id(e.detail.messageid);
     }
 
     function on_query_params_change(e) {
@@ -335,7 +341,7 @@ function add_speecher_events() {
     }
 */
     function on_speech_ended(e) {
-        msgDisp.speech_queue_entry_to_old_messages(e.detail.messageid, "ended", "link");
+        msgDisp.speech_queue_entry_to_old_messages(e.detail.messageid);//, "ended", "link");
     }
 
     function on_speech_error(e) {

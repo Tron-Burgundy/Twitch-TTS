@@ -9,11 +9,6 @@ const TTS_MSG_ID_PREFIX = "";
 const ALLOW_CLASS = 'is-success';
 const IGNORE_CLASS = 'is-danger';
 
-// const MSG_DELETED_EVENT = "messagedeleted";
-// const USER_IGNORE_EVENT = EVENTS.USER_IGNORED;
-// const USER_UNIGNORE_EVENT = "user:unignored";
-
-
 $speechQDiv.addEventListener("click", msg_queue_buttons_click_handler);
 $speechQOldDiv.addEventListener("click", msg_queue_buttons_click_handler);
 
@@ -38,7 +33,7 @@ export default class TTSMsgDisplay
 
 		let speechQRow = dce('nav');
 		speechQRow.id = messageid;
-		speechQRow.dataset.user = userLower;
+		speechQRow.dataset.userLower = userLower;
 		speechQRow.dataset.userCaps = userCaps;
 		speechQRow.classList.add('speechQRow');
 
@@ -62,11 +57,22 @@ export default class TTSMsgDisplay
 
 		let btnDel = dce('button');
 		btnDel.dataset.messageid = messageid;
-		btnDel.dataset.user = userLower;
+		btnDel.dataset.userLower = userLower;
         btnDel.dataset.type = "delete";
 
 		btnDel.textContent = 'del';
 		btnDel.classList.add('button', 'is-warning', 'is-small', 'ml-2', 'deletebtn');
+
+			// SKIP BUTTON
+			// SKIP BUTTON
+
+		let btnSkip = dce('button');
+		btnSkip.dataset.messageid = messageid;
+		btnSkip.dataset.userLower = userLower;
+        btnSkip.dataset.type = "skip";
+
+		btnSkip.textContent = 'skip';
+		btnSkip.classList.add('button', 'is-link', 'is-small', 'ml-2', 'skipbtn');
 
 			// BAN/IGNORE BUTTON
 			// BAN/IGNORE BUTTON
@@ -74,12 +80,14 @@ export default class TTSMsgDisplay
 		let btnBan = dce('button');
 		btnBan.textContent = 'ignore';
 		btnBan.classList.add('button', 'is-danger', 'is-small', 'ignorebtn');
-		btnBan.dataset.user = userLower;
-		btnBan.dataset.username = userCaps;	// user = cased, username = lower
+		btnBan.dataset.userLower = userLower;
+		btnBan.dataset.userCaps = userCaps;	// user = cased, username = lower
         btnBan.dataset.type = "ignore";
 
 		buttons.appendChild(btnBan);
 		buttons.appendChild(btnDel);
+		buttons.appendChild(btnSkip);
+
 			// username - text - buttons
 		speechQRow.append(usernameDiv, speech, buttons);
 
@@ -87,7 +95,16 @@ export default class TTSMsgDisplay
 		$speechQDiv.appendChild(frag)
 	}
 
-    speech_queue_entry_to_old_messages(id, addIdTag = null, colour = "info") {
+        /**
+         *
+         * @param {*} id
+         * @param {*} addIdTag
+         * @param {*} colour bulma colour with is- so warning instead of is-warning
+         * @param {*} addClasses space separated classes to add
+         * @returns
+         */
+
+    speech_queue_entry_to_old_messages(id, addIdTag = null, colour = "info", addClasses = "") {
         let nid = gid(TTS_MSG_ID_PREFIX + id);
 
         if (!nid) {
@@ -97,6 +114,11 @@ export default class TTSMsgDisplay
             // insert a div
         if (addIdTag) {
             speech_queue_add_tag(id, addIdTag, colour);
+        }
+
+        if (addClasses.length) {
+            let classes = addClasses.split(" ").filter(x => x); // the filter removes empty entries on multiple spaces if you forget
+            nid.classList.add(classes);
         }
             //$speechQOldDiv.appendChild(id);
         $speechQOldDiv.prepend(nid);
@@ -148,6 +170,7 @@ export default class TTSMsgDisplay
     }
 
     unignore_user(username) {
+        console.log("onuignore USERNAME", username);
         let userIgnoreBtns = get_user_ignore_btns(username);
 
         for (let iBtn of userIgnoreBtns) {
@@ -179,18 +202,24 @@ function msg_queue_buttons_click_handler(e) {
 
     if (btn.constructor === HTMLButtonElement) {
         let type = btn.dataset.type;
-
+        let nav = btn.parentNode.parentNode;
+        let dataset = {messageid: nav.id, ...nav.dataset};
+console.log("SENDING DATASET", dataset);
         switch (type) {
             case "ignore":
-                TT.emit(EVENTS.USER_IGNORED, btn.dataset);
+                TT.emit(EVENTS.USER_IGNORED, dataset);
                 break;
 
             case "unignore":
-                TT.emit(EVENTS.USER_UNIGNORED, btn.dataset);
+                TT.emit(EVENTS.USER_UNIGNORED, dataset);
                 break;
 
             case "delete":
-                TT.emit(EVENTS.MESSAGE_DELETED, btn.dataset);
+                TT.emit(EVENTS.MESSAGE_DELETED, dataset);
+                break;
+
+            case "skip":
+                TT.emit(EVENTS.MESSAGE_SKIPPED, dataset);
                 break;
 
             default:
@@ -223,9 +252,9 @@ function speech_queue_add_tag(id, text, colour = "info") {
 
 
 function get_user_ignore_btns(user) {
-    return qsa(`.ignorebtn[data-user="${user.toLowerCase()}"]`);
+    return qsa(`.ignorebtn[data-useLower="${user.toLowerCase()}"]`);
 }
 
 function get_user_upcoming_msgs(user) {
-    return qsa(`#speechqueue nav[data-user="${user.toLowerCase()}"]`);
+    return qsa(`#speechqueue nav[data-userLower="${user.toLowerCase()}"]`);
 }
