@@ -56,8 +56,8 @@ export default class TTSMsgDisplay
 			// DELETE BUTTON
 
 		let btnDel = dce('button');
-		btnDel.dataset.messageid = messageid;
-		btnDel.dataset.userLower = userLower;
+		// btnDel.dataset.messageid = messageid;
+		// btnDel.dataset.userLower = userLower;
         btnDel.dataset.type = "delete";
 
 		btnDel.textContent = 'del';
@@ -67,8 +67,8 @@ export default class TTSMsgDisplay
 			// SKIP BUTTON
 
 		let btnSkip = dce('button');
-		btnSkip.dataset.messageid = messageid;
-		btnSkip.dataset.userLower = userLower;
+		// btnSkip.dataset.messageid = messageid;
+		// btnSkip.dataset.userLower = userLower;
         btnSkip.dataset.type = "skip";
 
 		btnSkip.textContent = 'skip';
@@ -78,10 +78,10 @@ export default class TTSMsgDisplay
 			// BAN/IGNORE BUTTON
 
 		let btnBan = dce('button');
-		btnBan.textContent = 'ignore';
+		btnBan.textContent = 'ignore user';
 		btnBan.classList.add('button', 'is-danger', 'is-small', 'ignorebtn');
-		btnBan.dataset.userLower = userLower;
-		btnBan.dataset.userCaps = userCaps;	// user = cased, username = lower
+		btnBan.dataset.userLower = userLower;   // needed so we can find all buttons for a user
+		// btnBan.dataset.userCaps = userCaps;	// user = cased, username = lower
         btnBan.dataset.type = "ignore";
 
 		buttons.appendChild(btnBan);
@@ -148,12 +148,11 @@ export default class TTSMsgDisplay
     }
 
     ignore_user(username) {
-
         let userIgnoreBtns = get_user_ignore_btns(username);	// for changing allows
-
+console.log("IGNORE BUTTONS", userIgnoreBtns, username);
         for (let iBtn of userIgnoreBtns) {
             iBtn.dataset.type = "unignore";
-            iBtn.textContent = "un-ignore";
+            iBtn.textContent = "allow user";
             iBtn.classList.remove(IGNORE_CLASS);
             iBtn.classList.add(ALLOW_CLASS);
         }
@@ -161,13 +160,6 @@ export default class TTSMsgDisplay
         this.user_messages_to_old(username, "ignored", "success")
     }
 
-    user_messages_to_old(username, tag, colour) {
-        let sqUpcomingEntries = get_user_upcoming_msgs(username); // ban buttons have user and data-id
-        for (let upcomingEntry of sqUpcomingEntries) {	// only add tags to messages in main queue
-            this.speech_queue_entry_to_old_messages(upcomingEntry.id);
-            speech_queue_add_tag(upcomingEntry.id, tag, colour);
-        }
-    }
 
     unignore_user(username) {
         console.log("onuignore USERNAME", username);
@@ -175,9 +167,18 @@ export default class TTSMsgDisplay
 
         for (let iBtn of userIgnoreBtns) {
             iBtn.dataset.type = "ignore";
-            iBtn.textContent="ignore";
+            iBtn.textContent="ignore user";
             iBtn.classList.remove(ALLOW_CLASS);
             iBtn.classList.add(IGNORE_CLASS);
+        }
+    }
+
+
+    user_messages_to_old(username, tag, colour) {
+        let sqUpcomingEntries = get_user_upcoming_msgs(username); // ban buttons have user and data-id
+        for (let upcomingEntry of sqUpcomingEntries) {	// only add tags to messages in main queue
+            this.speech_queue_entry_to_old_messages(upcomingEntry.id);
+            speech_queue_add_tag(upcomingEntry.id, tag, colour);
         }
     }
 
@@ -252,9 +253,9 @@ function speech_queue_add_tag(id, text, colour = "info") {
 
 
 function get_user_ignore_btns(user) {
-    return qsa(`.ignorebtn[data-useLower="${user.toLowerCase()}"]`);
+    return qsa(`.ignorebtn[data-user-lower="${user.toLowerCase()}"]`);
 }
 
 function get_user_upcoming_msgs(user) {
-    return qsa(`#speechqueue nav[data-userLower="${user.toLowerCase()}"]`);
+    return qsa(`#speechqueue nav[data-user-lower="${user.toLowerCase()}"]`);
 }
