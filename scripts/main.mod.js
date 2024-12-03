@@ -260,14 +260,12 @@ function add_general_events() {
     }
 
     function on_user_ignored(e) {
-        console.log("IGNORED DATA", e);
         let deleted = speech.cancel_user_messages(e.detail.userLower);
         // toast("Deleted " + deleted + " messages for that bastard");
         msgDisp.ignore_user(e.detail.userLower);   // oh no you don't!
     }
 
     function on_user_unignored(e) {
-        console.log("USER IGNORED", e.detail);
         msgDisp.unignore_user(e.detail.userLower);   // oh no you don't!
     }
 
