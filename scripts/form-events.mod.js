@@ -26,7 +26,8 @@ const FORM_EVENT_HANDLERS_INITIAL = [
     {selector: "#stripchars", event: 'change', function: on_filter_chars_change, params: {}},
         // voice test buttons
     {selector: "button[data-index]", event: 'click', function: on_voice_test_btn_click, params: {}},
-    // save button in the save warning modal
+    {selector: ".voice-select", event: 'change', function: on_voice_test_btn_click, params: {}},
+        // save button in the save warning modal
     {selector: ".savecookie", event: "click", function: save_params_cookie, params: {}},
     //     {selector: '#loglabel', event: 'click', function: () => log('', true), params: {}},
 ];
@@ -125,11 +126,13 @@ function on_slider_input(e) {
 }
 
     /**
-     * Voice test button handler
+     * Voice test button handler and for voice select on change.  isTrusted is false for allchange events
      * @param {Click Event} e
      */
 
 function on_voice_test_btn_click(e) {
+    //console.log("V TEST EVENT", e, e.target);
+    if (!e.isTrusted) return;   // don't do it with the allchange event
     let idx = e.target.dataset["index"];
     let rate = gid("r"+idx).value;
     let pitch = gid("p"+idx).value;
