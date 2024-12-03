@@ -149,7 +149,7 @@ export default class TTSMsgDisplay
 
     ignore_user(username) {
         let userIgnoreBtns = get_user_ignore_btns(username);	// for changing allows
-console.log("IGNORE BUTTONS", userIgnoreBtns, username);
+
         for (let iBtn of userIgnoreBtns) {
             iBtn.dataset.type = "unignore";
             iBtn.textContent = "allow user";
@@ -162,7 +162,6 @@ console.log("IGNORE BUTTONS", userIgnoreBtns, username);
 
 
     unignore_user(username) {
-        console.log("onuignore USERNAME", username);
         let userIgnoreBtns = get_user_ignore_btns(username);
 
         for (let iBtn of userIgnoreBtns) {
@@ -205,7 +204,7 @@ function msg_queue_buttons_click_handler(e) {
         let type = btn.dataset.type;
         let nav = btn.parentNode.parentNode;
         let dataset = {messageid: nav.id, ...nav.dataset};
-console.log("SENDING DATASET", dataset);
+
         switch (type) {
             case "ignore":
                 TT.emit(EVENTS.USER_IGNORED, dataset);
@@ -228,10 +227,17 @@ console.log("SENDING DATASET", dataset);
         }
         return;
     }
-
         // emit that a row was clicked
+        // row clicks sometimes hit the container behind the row
+    let row = e.target;
 
-    let row = e.target.nodeName === "NAV" ? e.target : e.target.parentNode;
+    if (e.target.nodeName !== "NAV") {
+        row = row.parentNode;
+
+        if (row.nodeName !== "NAV")
+            return; // we've hit the backboard
+    }
+
     TT.emit(EVENTS.MESSAGE_ROW_CLICK, {...row.dataset, id:row.id});
 }
 

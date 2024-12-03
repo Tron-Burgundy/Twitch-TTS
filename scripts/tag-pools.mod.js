@@ -32,15 +32,14 @@ var initialised = false;
     //// MAIN ////
     //// MAIN ////
 
-// window.addEventListener("load",
-
 export function init_tag_pools() {
     if (initialised) return;
     initialised = true;
 
+    cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
+        // delete labels and checkboxes in the tag pools
     delete_checkboxes_init(); // should this go to the master?  Your faith against the master's
 
-cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
         ///// ADD HANDLERS /////
     TT.emitter.on(EVENTS.USER_IGNORED, e => { //       console.log("IGNORED in pools", e);
         delete_from_tag_pool(e.detail.userLower, "allownamed", false);
@@ -55,12 +54,10 @@ cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
     });
 
     TT.emitter.on(EVENTS.NICKNAME_ADDED, e => { //       console.log("nicknamedeleted in POOLS", e);
-        console.log("NIC ADD", e.detail);
         add_to_complex_pool(e.detail.userCaps, e.detail.nickname, "nicknames");
     });
 
     TT.emitter.on(EVENTS.NICKNAME_DELETED, e => { //       console.log("nicknamedeleted in POOLS", e);
-        console.log("DELETED GOT", e.detail);
         delete_from_tag_pool(e.detail.userLower, "nicknames", true);
     });
 
@@ -77,6 +74,7 @@ cclog("TAG POOLS INIT please be LOADED only ONCE", "m");
         // clicking a message row transfers their name to the nickname page.
     TT.emitter.on(EVENTS.MESSAGE_ROW_CLICK, e => {
         toast("Loaded <strong>" + e.detail.userCaps + "</strong>", "is-warning");
+        if (e.detail.userCaps === undefined) console.log("UNDEFINED", e.detail);
         user_things_populate(e.detail.userCaps);
     });
 
@@ -207,7 +205,6 @@ function on_tag_click(e) {
     let dataset = null;
 
     let type = e.target.constructor;
-    //console.log("ON TAG CLICK", e);
 
     switch (type) {
         case HTMLButtonElement:
@@ -275,11 +272,10 @@ export function create_tag_pools() {
 function create_simple_tag_pool(poolId, inputFieldId) {
     let pool = gid(poolId);
     let data = gid(inputFieldId).value;
-    let users = split_to_array(data);
-    //let users = split_on_space_replace(data);
-
+    //let users = split_to_array(data);
+    let users = split_on_space_replace(data);
     users.sort( (a,b) => a.localeCompare(b) );
-console.log("SIMPLE TAG POOL GOT", users);
+
     remove_children(pool);
 
     for ( let u of users ) {
@@ -376,8 +372,8 @@ function add_to_simple_pool(user, targetId) {
     user = to_username( user );
     let field = gid(targetId);
 
-    let currUsers = split_to_array( field.value );
-    // let currUsers = split_on_space_replace( field.value );
+    //let currUsers = split_to_array( field.value );
+    let currUsers = split_on_space_replace( field.value );
     let currUsersLower = currUsers.map(x => x.toLowerCase());
     if (currUsersLower.includes(user.toLowerCase())) return;
 
@@ -427,8 +423,8 @@ function del_from_key_value_field(inputSrcId, userLower) {
 
 function del_from_simple_field(inputSrcId, userLower) {
     let target = gid(inputSrcId);
-    let vals = split_to_array(target.value);
-    // let vals = split_on_space_replace(target.value);
+    //let vals = split_to_array(target.value);
+    let vals = split_on_space_replace(target.value);
     vals = vals.filter(x => x.toLowerCase() !== userLower);
     target.value = vals.join(SPACE_REPLACE);
     trigger_onchange(target);
@@ -464,7 +460,7 @@ function to_username(name) {
 }
 
 function split_on_space_replace(txt) {
-    return txt.split(SPACE_REPLACE);
+    return txt.split(SPACE_REPLACE).filter(e => e);
 }
 
 function trigger_onchange(element) {

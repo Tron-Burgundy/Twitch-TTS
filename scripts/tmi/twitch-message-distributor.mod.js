@@ -38,7 +38,7 @@ function tmi_message_handler(channel, userstate, message, self) {
 // DEBUG - just to stop the everything listern annoying me
 	if (TT.config.chatEnabled != true) return;
 		// are they permitted ?
-	if (! user_permitted( userstate )) {            // console.debug("USER NOT PERMITTED", userstate['username']);
+	if (! user_permitted( userstate )) {            // console.debug("USER NOT PERMITTED", userstate['user name']);
 		return false;
 	}
 		// return if the message type isn't readable

@@ -311,14 +311,14 @@ export default class SpeecherRevamped {
 
 
         // this could emit for every message deleted...
-    cancel_user_messages(username) {
-        username = username.toLowerCase();
+    cancel_user_messages(userLower) {
+        userLower = userLower.toLowerCase();
         // console.log("CANCEL USER MESSAEGS GOT", username);
         // console.log("UTTERANCE NOW", this.utterance);
         let count = 0;
-        if (this.utterance?.customdata.userLower === username) this.cancel();
+        if (this.utterance?.customdata.userLower === userLower) this.cancel();
         this.speechQueueMap.forEach( (value, key, map) => {
-            if (value.userLower === username) {
+            if (value.userLower === userLower) {
                 this.cancel_id(key);
                 count++;
             }
