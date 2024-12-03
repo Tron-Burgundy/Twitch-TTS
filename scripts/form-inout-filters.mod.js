@@ -24,7 +24,7 @@ export const FORM_IN_OUT_FILTERS = { // apply to keys or elements?
         out: x => x.trim()},
 
     spaced: {
-        //in: form_filter_restore_spaces,
+        in: form_filter_restore_spaces, // channels needs this
         out: form_filter_convert_spaces},
         // turns
     mypairsthing: { // not needed, they're for hidden fields.  One will be used for data-to
