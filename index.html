@@ -21,6 +21,7 @@
           <li class="is-active"><a>Speech Queue</a></li>
           <li class="pl-tab"><a>Channels and Voices</a></li>
           <li class="insts-tab"><a>Nicknames and Ignored</a></li>
+          <li class="insts-tab"><a>Replace</a></li>
         </ul>
       </div><span class="button m-0 ml-2 is-small is-success modal-trigger" data-target="configModal" title="Config"><i class="fas fa-gear"></i></span>
       <!--span.button#savewarning.is-hidden.m-0.ml-2.is-small-->
@@ -1229,6 +1230,43 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="tab-pane">
+        <div class="box">
+          <div class="title">In DEVELOPMENT - DOn'T uSE yeT!!</div>
+          <div class="is-flex-tablet flex-wrap-nowrap is-align-items-center">
+            <div class="is-flex">
+              <input class="input" id="replaceword" placeholder="replace term" autocomplete="off" title="replace this term">
+              <input class="input" id="replacewith" placeholder="replace with" autocomplete="off" title="replace with this">
+            </div>
+            <div class="is-flex is-align-items-center">
+              <div class="is-flex">
+                <input class="mx-2" id="pany" type="radio" name="pos" checked>
+                <label class="label" for="pany">anywhere</label>
+              </div>
+              <div class="is-flex">
+                <input class="mx-2" id="pstart" type="radio" name="pos">
+                <label class="label" for="pstart">start</label>
+              </div>
+              <div class="is-flex">
+                <input class="mx-2" id="pend" type="radio" name="pos">
+                <label class="label" for="pend">end</label>
+              </div>
+              <div class="is-flex">
+                <input class="ml-4 mr-2" id="wholeword" type="checkbox">
+                <label class="label" for="wholeword">replace whole word</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="is-flex is-align-items-center mb-2">
+          <div>
+            <div class="title is-5">Replace Terms</div>
+          </div>
+          <input class="hide-button-toggle mx-2" id="replacedel" type="checkbox" data-for="replaceTagPool">
+          <label class="label" for="replacedel">delete</label>
+        </div>
+        <div class="hide-buttons" id="replaceTagPool"></div>
       </div>
     </div>
     <div class="modal" id="configModal" data-theme="dark">

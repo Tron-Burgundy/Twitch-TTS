@@ -45,7 +45,7 @@ export function init_tag_pools() {
         delete_from_tag_pool(e.detail.userLower, "allownamed", false);
     });
 
-    TT.emitter.on(EVENTS.USER_UNALLOWED, e => {       console.log("unallowed in pools", e);
+    TT.emitter.on(EVENTS.USER_UNALLOWED, e => {//       console.log("unallowed in pools", e);
         delete_from_tag_pool(e.detail.userLower, "allownamed", false);
     });
 

@@ -138,7 +138,7 @@ export class Emoter {
 
 	_process_ffz_channel(d, chanId) {
 		if (d.error) {
-			console.warn("Error on FFZ", d)
+			console.warn("Error on FFZ", d);
 			return [];
 		}
 
@@ -185,7 +185,7 @@ export class Emoter {
 
     _process_7tv_channel(d, chanId) {
         if (d.error) {
-            console.warn('Error on 7tv channel', d)
+            console.warn('Error on 7tv channel', d);
             return [];
         }
             // please let this work, it's pretty
@@ -202,7 +202,7 @@ export class Emoter {
 
     _process_7tv_globals(d) {
         if (d.error) {
-            console.warn('Error on 7tv globals', d)
+            console.warn('Error on 7tv globals', d);
             return [];
         }console.log("7TV", d);
             // please let this work, it's pretty

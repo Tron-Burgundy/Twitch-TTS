@@ -218,40 +218,30 @@ let urlPopTimeoutActive = false;
 
 export function url_populate(e) {
 		// sime time check to stop this being hammered
-/* 	if (urlPopTimeoutActive === true) return;
-	urlPopTimeoutActive = true; */
+/* 	if (urlPopTimeoutActive === true) return;  urlPopTimeoutActive = true; */
 
-	// setTimeout(x => {
-		let urlParams = query_string_from_inputs();
+	let urlParams = query_string_from_inputs();
 
-		urlParams = "?" + urlParams;
+	urlParams = "?" + urlParams;
 
-		if (window.location.search === urlParams) {//cclog("NO NEEDS", "g");
-			return;
-		}
+	if (window.location.search === urlParams) {//cclog("NO NEEDS", "g");
+		return;
+	}
 
-		cclog("URL repopulated", "y");
-		// console.log("url pop", e.target);
-		// console.log("search len, params len", window.location.search.length, urlParams.trim().length);
-		// console.log("w/u:");
-		// cclog("'" + window.location.search + "'");
-		// console.log("\n\n");
-		// console.log("'" + urlParams + "'");
-		// console.log("w/u:", window.location.search, "\n\n", urlParams);
+	cclog("URL repopulated", "y");
 
-			// sets the value in localStorage to use in form values restore
-		localstore_save(urlParams);
-		// let url = window.location.origin + window.location.pathname + urlParams;
-		let url = window.location.origin + window.location.pathname + urlParams;
+		// sets the value in localStorage to use in form values restore
+	localstore_save(urlParams);
+	let url = window.location.origin + window.location.pathname + urlParams;
 
-		history.replaceState({}, null, url);
+	history.replaceState({}, null, url);
 
-		if (TT.queryStringOnLoad !== urlParams) {
-			TT.emit(EVENTS.QUERY_PARAMS_CHANGED)
-		} else {
-			TT.emit(EVENTS.QUERY_PARAMS_UNCHANGED)
-		}
+	if (TT.queryStringOnLoad !== urlParams) {
+		TT.emit(EVENTS.QUERY_PARAMS_CHANGED)
+	} else {
+		TT.emit(EVENTS.QUERY_PARAMS_UNCHANGED)
+	}
 
-		urlPopTimeoutActive = false;
+	urlPopTimeoutActive = false;
 	// }, 500);
 }

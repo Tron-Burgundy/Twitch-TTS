@@ -169,13 +169,15 @@ function load_params_cookie() {
 
     // great to see the most found get and set cookie funcs on the net are bad
     // I did a url encode of name and value, now let's cheapen that with a replace
+    // going with the string replace so there's extra storage in the cookie
 
 const repColonSpace = "¼Æþ";    // replaces "; " in names and values
+
 function setCookie(cName, cValue, expDays = 1000) {
     let date = new Date();
     date.setTime(date.getTime() + (expDays * 86400 * 1000));
     const expires = "expires=" + date.toUTCString();
-    // document.cookie = encodeURIComponent(cName) + "=" + encodeURIComponent(cValue) + "; " + expires + "; path=/";
+    //document.cookie = encodeURIComponent(cName) + "=" + encodeURIComponent(cValue) + "; " + expires + "; path=/";
     document.cookie = cName.replace("; ", repColonSpace) + "=" + cValue.replace("; ", repColonSpace) + "; " + expires + "; path=/";
 }
 
@@ -183,13 +185,15 @@ function setCookie(cName, cValue, expDays = 1000) {
 
 function getCookie(cName) {
     cName = cName.replace("; ", repColonSpace);
-
+    //cName = encodeURIComponent(cName);
     const eqPairs = document.cookie.split("; ");
 
     for (let val of eqPairs) {
-        let n = val.split("=", 1)[0];
+        //let n = val.split("=", 1)[0];
+        let [n,v] = val.split("=");
 
-        if (n === cName) {            //return decodeURIComponent(v);
+        if (n === cName) {
+            //return decodeURIComponent(v);
             return val.substring(n.length + 1).replace(repColonSpace, "; ");
         }
     }
@@ -199,3 +203,12 @@ function getCookie(cName) {
 
 window._sc = setCookie;
 window._gc = getCookie;
+
+
+/*  Benchmarks - minimal for real usage so URI encode as long as the 20% extra space isn't an issue
+100,000 loops of set cookie: 5911.099999964237 <--- encode uri
+100,000 loops of set cookie: 5731.400000035763 <--- str replace method
+
+100,000 loops of Get cookie: 1658.7000000476837 <--- encode url
+100,000 loops of Get cookie: 222.0999999642372  <--- replace
+*/
