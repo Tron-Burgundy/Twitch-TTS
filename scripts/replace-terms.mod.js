@@ -8,10 +8,10 @@
  * none whole words //
  *
  */
-import EVENTS from "./event-constants.mod";
-import { SPACE_REPLACE } from "./config.mod";
-import { trigger_onchange } from "./tag-pools.mod";
-import { create_tag_pools } from "./tag-pools.mod";
+import EVENTS from "./event-constants.mod.js";
+import { SPACE_REPLACE } from "./config.mod.js";
+import { trigger_onchange } from "./tag-pools.mod.js";
+import { create_tag_pools } from "./tag-pools.mod.js";
 
 const OPTION_SPLIT = "--";    // !~.()_*'-
 let replacersInitialised = false;
