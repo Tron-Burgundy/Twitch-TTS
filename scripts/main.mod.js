@@ -4,7 +4,7 @@
  * Should classes at their own listeners or should I pass them on?
  */
 window.TT = window.TT ?? {};
-const JANKED = window.location.hostname == "127.0.0.1" || "localhost" ? true : false;    // a percentage could also be added
+const JANKED = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" ? true : false;    // a percentage could also be added
 
 window._j = JANKED;
 
