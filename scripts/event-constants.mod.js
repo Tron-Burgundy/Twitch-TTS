@@ -8,6 +8,7 @@ export const EVENTS = {
     USER_UNIGNORED: "user:unignored",
     USER_UNALLOWED: "user:unallowed",
     USER_ALWAYS_ALLOWED: "user:alwaysallowed",
+
     USER_BANNED: "user:banned",
     USER_TIMEOUT: "user:timeout",
 
@@ -15,6 +16,9 @@ export const EVENTS = {
     NICKNAME_DELETED: "user:nicknamedeleted",
     AUTOVOICE_ADDED: "user:autovoiceadded",
     AUTOVOICE_DELETED: "user:autovoicedeleted",
+
+    REPLACE_ADDED: "replace:added",
+    REPLACE_REMOVED: "replace:removed",
 
     TWITCH_MESSAGE: "twitch:message",
     TWITCH_MESSAGE_DELETED: "twitch:messagedeleted",

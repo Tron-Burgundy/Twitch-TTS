@@ -80,7 +80,7 @@ export function parse_key_value_string(pString, target) {
 
     for(let p of splits1) {
         let [prop, val] = p.split("(");
-        if (val) obj[prop] = val.replaceAll(KVP_SPACE_SUB, " ");
+        if (val) obj[prop.replaceAll(KVP_SPACE_SUB, " ")] = val.replaceAll(KVP_SPACE_SUB, " ");
     }
 
     return obj;
@@ -96,7 +96,7 @@ export function parse_key_value_string(pString, target) {
 export function to_key_value_string(valObj, target) {
     let tp = valObj;    // will I fuck it up
     let set =[];
-
+        // don't allow ()~ in values
     let repRgx = new RegExp(`(\\(|\\)|\\${KVP_SPACE_SUB})`, "g");
 
     for(let prop in tp) {
@@ -112,3 +112,5 @@ export function to_key_value_string(valObj, target) {
 export function split_to_array(str) {
     return str.split(/[^a-zA-Z0-9-_$£.]/).filter(e => e);
 }
+"; "
+

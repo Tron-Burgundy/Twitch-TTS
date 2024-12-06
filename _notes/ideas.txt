@@ -74,7 +74,13 @@ All this guff is going to save me like, 3% of the 6000 char length url
 
 Shortening the URL - can't save too much but
 
-!~.()_* don't url encode  so = and space can save 2 chars each +
+!~.()_*'- don't url encode  so = and space can save 2 chars each +
+
+Gotta come up with a scheme for then
+
+Search~term(replace~term'options)
+
+
 I want to allow ! in nicknames so
 flipthatnoise~shit*that*bed.flipthatnoise*shit~that~bed
 

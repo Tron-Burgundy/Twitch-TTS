@@ -19,6 +19,7 @@ import { populate_voice_selects } from "./voice-selects-setup.mod.js";
 import { create_commands_voice_map } from "./voice-selects-setup.mod.js";
 import { stop_go_icon_off, stop_go_icon_on } from "./view.mod.js";
 import { NAME_DIGITS_REMOVE_REGEX } from "./config.mod.js";
+import { REPLACE_EVENTS } from "./replace-terms.mod.js";
 
 
 const queryStringOnLoad = window.location.search;
@@ -55,6 +56,8 @@ window.addEventListener("load", async function main() {
     create_tag_pools();
         // ones that won't go crazy on allchange
     add_form_element_listeners();
+    add_form_element_listeners(REPLACE_EVENTS);
+
         // this will trigger config population
     TT.allchange();
         // these listeners is added post initial changes because it triggers a lot of activity
@@ -97,6 +100,9 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
 
     msgDisp.speech_queue_add_entry(pack);   // this or emit a different message queueingmessage
 
+        // replace regex terms before atted name conversion
+    pack.message = regex_term_replace(pack.message);
+
         // convert atted names
     pack.message = atted_names_convert(pack.message);
     if (TT.config.chatFilterChars.length)
@@ -109,7 +115,7 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
 
     if (JANKED) {
         let vCmd = hasVoiceCmd.voiceCmd ?? TT.config.userAutoVoices[pack.userLower];
-        if (vCmd)  // the default "undefined" indexed voice never gets text added
+        if (TT.config.autoVoiceMap[vCmd])//vCmd)  // the default "undefined" indexed voice never gets text added
             TT.config.autoVoiceMap[vCmd].text = pack.message;
     }
 
@@ -160,6 +166,13 @@ function username_convert(name) {
     name = name.replace(camelCaseRegex, "$1 $2");
 
     return name;
+}
+
+function regex_term_replace(text) {
+    for (let [rgx, replace] of TT.config.regexReplacers) {
+        text = text.replace(rgx, replace);
+    }
+    return text;
 }
 
 function atted_names_convert(message) {

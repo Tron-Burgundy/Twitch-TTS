@@ -1100,37 +1100,7 @@
       </div>
       <div class="tab-pane">
         <!--// IGNORED / ALLOWED PANE ////-->
-        <!--// IGNORED / ALLOWED PANE ////
-        .field.is-grouped
-            .field.has-addons.is-horizontal
-                .control
-                    input.input#username(placeholder="user name" autocomplete="off" title="User's name")
-        
-                .control
-                    input.input#nickname(placeholder="nickname" autocomplete="off" title="Nickname")
-        
-                .select
-                    select#voicecommand(title="Voice command to use")
-                        option(value="")
-                            | Use voice
-                        option(value="")
-                            | Default
-        
-                .control
-                    button.button.is-success#updateuser
-                        span.icon
-                            i.fas.fa-circle-play
-        
-            .control
-                button#ignoreuserbtn.button.is-warning Ignore
-        
-            //- .control
-            //-     button#deleteuserbtn.button.is-danger Delete
-            //-         input(type="checkbox").ml-2#deleteuserconfirm
-        
-            .control
-                button#alwaysallowuserbtn.button.is-success Always Allow
-        -->
+        <!--// IGNORED / ALLOWED PANE ////-->
         <div class="box">
           <div class="is-flex-tablet flex-wrap-nowrap">
             <div class="div is-flex">
@@ -1233,40 +1203,49 @@
       </div>
       <div class="tab-pane">
         <div class="box">
-          <div class="title">In DEVELOPMENT - DOn'T uSE yeT!!</div>
           <div class="is-flex-tablet flex-wrap-nowrap is-align-items-center">
-            <div class="is-flex">
-              <input class="input" id="replaceword" placeholder="replace term" autocomplete="off" title="replace this term">
-              <input class="input" id="replacewith" placeholder="replace with" autocomplete="off" title="replace with this">
+            <div class="is-flex is-flex-grow-1" style="max-width: 40em;">
+              <!--input.input#replaceword(placeholder="replace term" autocomplete="off" title="replace this term")-->
+              <!--input.input#replacewith(placeholder="replace with" autocomplete="off" title="replace with this")-->
+              <!--.field.has-addons-->
+              <input class="input" style="width: 100%; max-width: 24em;" id="replaceterm" placeholder="replace term" title="replace term">
+              <input class="input" style="width: 100%; max-width: 24em;" id="replacewith" placeholder="replace with (can be blank)" title="replace with">
+              <button class="button is-success" id="replacetermbtn"><span class="icon"><i class="fas fa-check"></i></span></button>
             </div>
-            <div class="is-flex is-align-items-center">
+            <div class="is-flex is-align-items-center is-flex-shrink-1">
               <div class="is-flex">
-                <input class="mx-2" id="pany" type="radio" name="pos" checked>
+                <input class="mx-2" id="pany" type="radio" name="pos" checked value="A">
                 <label class="label" for="pany">anywhere</label>
               </div>
               <div class="is-flex">
-                <input class="mx-2" id="pstart" type="radio" name="pos">
+                <input class="mx-2" id="pstart" type="radio" name="pos" value="S">
                 <label class="label" for="pstart">start</label>
               </div>
               <div class="is-flex">
-                <input class="mx-2" id="pend" type="radio" name="pos">
+                <input class="mx-2" id="pend" type="radio" name="pos" value="E">
                 <label class="label" for="pend">end</label>
               </div>
               <div class="is-flex">
                 <input class="ml-4 mr-2" id="wholeword" type="checkbox">
-                <label class="label" for="wholeword">replace whole word</label>
+                <label class="label" for="wholeword" title="Replaces whole words if the term is part of it
+e.g. 'bum' with whole word replaces all of bumface or fattybumbatty">replace whole word</label>
               </div>
             </div>
           </div>
         </div>
-        <div class="is-flex is-align-items-center mb-2">
-          <div>
-            <div class="title is-5">Replace Terms</div>
+        <div class="box">
+          <div class="is-flex is-align-items-center mb-2">
+            <div>
+              <div class="title is-5">Replace Terms</div>
+            </div>
+            <input class="hide-button-toggle mx-2" id="replacedel" type="checkbox" data-for="replaceTagPool">
+            <label class="label" for="replacedel">delete</label>
           </div>
-          <input class="hide-button-toggle mx-2" id="replacedel" type="checkbox" data-for="replaceTagPool">
-          <label class="label" for="replacedel">delete</label>
+          <div class="hide-buttons" id="replaceTagPool"></div>
         </div>
-        <div class="hide-buttons" id="replaceTagPool"></div>
+        <div class="is-hidden">
+          <input class="input form-save" id="replace" type="text" data-to="replaceTerms" data-type="replacers" value="a rude thing(you mucky swine--A)">
+        </div>
       </div>
     </div>
     <div class="modal" id="configModal" data-theme="dark">

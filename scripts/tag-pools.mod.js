@@ -24,6 +24,7 @@ import { parse_key_value_string, to_key_value_string, split_to_array } from "./f
 import { SPACE_REPLACE } from "./config.mod.js";
 import EVENTS from "./event-constants.mod.js";
 import { voiceCmdSelect } from "./voice-selects-setup.mod.js";
+import { parse_term_replace_string, replace_term_populate } from "./replace-terms.mod.js";
 
 cclog("HEYYYYYYYYYYYYYYYY Tag Pools.mod LOADED AGAIN", "m");
 
@@ -42,31 +43,44 @@ export function init_tag_pools() {
 
         ///// ADD HANDLERS /////
     TT.emitter.on(EVENTS.USER_IGNORED, e => { //       console.log("IGNORED in pools", e);
-        delete_from_tag_pool(e.detail.userLower, "allownamed", false);
+        delete_from_shadow_field(e.detail.userLower, "allownamed", false);
+        create_tag_pools();
     });
 
     TT.emitter.on(EVENTS.USER_UNALLOWED, e => {//       console.log("unallowed in pools", e);
-        delete_from_tag_pool(e.detail.userLower, "allownamed", false);
+        delete_from_shadow_field(e.detail.userLower, "allownamed", false);
+        create_tag_pools();
     });
 
     TT.emitter.on(EVENTS.USER_UNIGNORED, e => { //       console.log("UNIGNORED in POOLS", e);
-        delete_from_tag_pool(e.detail.userLower, "ignoredusers", false);
+        delete_from_shadow_field(e.detail.userLower, "ignoredusers", false);
+        create_tag_pools();
     });
 
     TT.emitter.on(EVENTS.NICKNAME_ADDED, e => { //       console.log("nicknamedeleted in POOLS", e);
-        add_to_complex_pool(e.detail.userCaps, e.detail.nickname, "nicknames");
+        add_to_complex_shadow_field(e.detail.userCaps, e.detail.nickname, "nicknames");
+        create_tag_pools();
     });
 
     TT.emitter.on(EVENTS.NICKNAME_DELETED, e => { //       console.log("nicknamedeleted in POOLS", e);
-        delete_from_tag_pool(e.detail.userLower, "nicknames", true);
+        delete_from_shadow_field(e.detail.userLower, "nicknames", true);
+        create_tag_pools();
     });
 
     TT.emitter.on(EVENTS.AUTOVOICE_ADDED, e => {//        console.log("autovoicedeleted in POOLS", e);
-        add_to_complex_pool(e.detail.userCaps, e.detail.voice, "autovoices");
+        add_to_complex_shadow_field(e.detail.userCaps, e.detail.voice, "autovoices");
+        create_tag_pools();
     });
 
     TT.emitter.on(EVENTS.AUTOVOICE_DELETED, e => {//        console.log("autovoicedeleted in POOLS", e);
-        delete_from_tag_pool(e.detail.userLower, "autovoices", true);
+        delete_from_shadow_field(e.detail.userLower, "autovoices", true);
+        create_tag_pools();
+    });
+
+    TT.emitter.on(EVENTS.REPLACE_REMOVED, e => {
+        console.log("RMOVE RPLACE", e.detail.term);
+        delete_from_shadow_field(e.detail.term, "replace", true);
+        create_tag_pools();
     });
 
     TT.emitter.on(EVENTS.USER_ALWAYS_ALLOWED, on_allow_user);
@@ -87,6 +101,9 @@ export function init_tag_pools() {
     gid("nicknameTagPool").dataset["emit"] = EVENTS.NICKNAME_DELETED;
     gid("allowedTagPool").dataset["emit"] = EVENTS.USER_UNALLOWED;
     gid("ignoredTagPool").dataset["emit"] = EVENTS.USER_UNIGNORED;
+
+    gid("replaceTagPool").dataset["emit"] = EVENTS.REPLACE_REMOVED;
+    gid("replaceTagPool").dataset["type"] = "replaceterm";
 
         ////////// EVENT LISTENERS //////////
         ////////// EVENT LISTENERS //////////
@@ -214,8 +231,13 @@ function on_tag_click(e) {
 
                 break;
             case HTMLSpanElement:
+                let pDset = e.target.parentNode.dataset;
                 dataset = e.target.dataset;
-                user_things_populate(dataset.userCaps);
+                if (pDset.type === "replaceterm") {
+                    replace_term_populate(dataset.term);
+                    return;
+                }
+                user_things_populate(dataset.userCaps); // this may not be the case
             break;
 
         default:
@@ -261,6 +283,8 @@ export function create_tag_pools() {
 
     create_key_value_pool("nicknameTagPool", "nicknames", ": ", EVENTS.NICKNAME_DELETED);
     create_key_value_pool("autoVoiceTagPool", "autovoices", ": !", EVENTS.AUTOVOICE_DELETED);
+
+    create_replacer_pool("replaceTagPool", "replace", ": ", EVENTS.REPLACE_REMOVED);
 }
 
     /**
@@ -322,6 +346,40 @@ function create_key_value_pool(poolId, inputFieldId, separator = ": ") {
     }
 }
 
+    /**
+     * Creates key: value tags
+     * @param {string} poolId div where to put the tags
+     * @param {string} inputFieldId a reference to a field to turn into a key/value object
+     */
+
+function create_replacer_pool(poolId, inputFieldId, separator = ": ") {
+    let pool = gid(poolId);
+    let data = gid(inputFieldId).value;
+        // naturally sorted
+        //console.log("COMPLEX POOL OBJ", pairObj);
+    remove_children(pool);
+        // parse the key pair string, turn to array and sort by key
+    let terms = parse_term_replace_string(data);
+    // let pairObj = parse_key_value_string(data);
+    let entries = terms.sort( (a,b) => a.term.localeCompare(b.term));
+    //Object.entries(pairObj).sort((a,b) => a[0].localeCompare(b[0]));
+
+    for (let termset of entries) {
+        //let value = pairObj[prop];
+        let text = termset.term + separator + termset.to;
+
+        let tag = create_tag(text);
+        tag.dataset["term"] = termset.term;
+        // tag.dataset["userCaps"] = userCaps;
+        // tag.dataset["value"] = value;
+        // tag.dataset["from"] = inputFieldId;
+
+        let delBtn = create_tag_del_button();
+        tag.append(delBtn);
+        pool.append(tag);
+    }
+}
+
 function create_tag(text, classis = "is-link") {
     let span = dce("span");
     span.classList.add('tag', classis, "is-medium", 'p-4', 'pr-1', 'm-2' );
@@ -343,21 +401,20 @@ function create_tag_del_button(addClass="is-link") {
     /**
      *  DECIDES it pool uses simple or complex shadow form field source
      * @param {string} user string of their name
-     * @param {string} inputSrcId for element id of what will be a hidden text field
+     * @param {string} shadowInputId for element id of what will be a hidden text field
      * @param {boolean} isKeyPairField whether to use an array split or a key pair split
      */
 
-function delete_from_tag_pool(user, inputSrcId, isKeyPairField = false) {
-    let target = gid(inputSrcId);
-    let userLower =  to_username(user.toLowerCase());
+function delete_from_shadow_field(user, shadowInputId, isKeyPairField = false) {
+    let target = gid(shadowInputId);
+    //let userLower =  to_username(user.toLowerCase());
+    let userLower =  user.toLowerCase();//.replaceAll(SPACE_REPLACE, " ");
 
     if (isKeyPairField) {  //console.log("IT IS COMPLAX", target.value);
-        del_from_key_value_field(inputSrcId, userLower);
+        del_from_key_value_field(shadowInputId, userLower);
     } else {
-        del_from_simple_field(inputSrcId, userLower);
+        del_from_simple_field(shadowInputId, userLower);
     }
-
-    create_tag_pools();
 }
 
 
@@ -368,7 +425,7 @@ function delete_from_tag_pool(user, inputSrcId, isKeyPairField = false) {
      * @returns
      */
 
-function add_to_simple_pool(user, targetId) {
+function add_to_simple_shadow_field(user, targetId) {
     user = to_username( user );
     let field = gid(targetId);
 
@@ -381,10 +438,16 @@ function add_to_simple_pool(user, targetId) {
     field.value = currUsers.join(SPACE_REPLACE);
         // update the underlying
     trigger_onchange(field);
-    create_tag_pools();
 }
 
-function add_to_complex_pool(userCaps, value, targetId) {
+    /**
+     * This is doing TWO jobs at once, updating the hidden field
+     * @param {*} userCaps
+     * @param {*} value
+     * @param {*} targetId
+     */
+
+function add_to_complex_shadow_field(userCaps, value, targetId) {
     userCaps = to_username(userCaps);
     let userLower = userCaps.toLowerCase();
     let field = gid(targetId);
@@ -405,19 +468,20 @@ function add_to_complex_pool(userCaps, value, targetId) {
 
     field.value = to_key_value_string(currUsers);
     trigger_onchange(field);
-    create_tag_pools();
 }
 
 
 function del_from_key_value_field(inputSrcId, userLower) {
     let target = gid(inputSrcId);
     let kvps = parse_key_value_string(target.value);
+
     for (let prop in kvps) {
         if (prop.toLowerCase() === userLower) {
             delete kvps[prop]; // deleted = true; break;
         }
     }
     target.value = to_key_value_string(kvps);
+
     trigger_onchange(target);
 }
 
@@ -438,17 +502,16 @@ function del_from_simple_field(inputSrcId, userLower) {
 
   // add user to always tag pool
 function on_allow_user(e) {
-    add_to_simple_pool(e.detail.userCaps, "allownamed");
+    add_to_simple_shadow_field(e.detail.userCaps, "allownamed");
+    create_tag_pools();
 }
     // add user to ignored tag pool - username is capsed
 function on_ignore_user(e) {
-    add_to_simple_pool(e.detail.userCaps, "ignoredusers");
+    add_to_simple_shadow_field(e.detail.userCaps, "ignoredusers");
+    create_tag_pools();
 }
 
 
-function on_add_to(dataset) {
-    console.log("ADDING TO", dataset);
-}
 
 
     //////////// UTILS //////////
@@ -463,7 +526,7 @@ function split_on_space_replace(txt) {
     return txt.split(SPACE_REPLACE).filter(e => e);
 }
 
-function trigger_onchange(element) {
+export function trigger_onchange(element) {
     let ev = new Event("change");
     element.dispatchEvent(ev);
 }

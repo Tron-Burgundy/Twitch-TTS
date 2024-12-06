@@ -29,6 +29,8 @@ Object.assign(TT.config, // MOST tools add their config to this to make observin
 	ignoredUsers: "",
 	nicknames: "",
 
+	regexReplacers: [],	// objects or [rgx, replace] ?
+
 	autoVoiceMap: {},
 
 	chatEnabled: false,
