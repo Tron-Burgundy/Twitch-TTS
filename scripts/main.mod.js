@@ -170,9 +170,28 @@ function username_convert(name) {
     return name;
 }
 
+    /**
+     * This is simple but if you have terms that replace a term then another can turn it back
+     * So either split or put in tokens/hashes
+     * @param {*} text
+     * @returns
+     */
+
 function regex_term_replace(text) {
+    let tokens = [];
+    let count = 0;
     for (let [rgx, replace] of TT.config.regexReplacers) {
-        text = text.replace(rgx, replace);
+        //text = text.replace(rgx, replace);
+        let token = "{+" + count + "+}";
+        text = text.replace(rgx, token);
+        // tokens.push(replace);
+        count++;
+    }
+    count = 0;
+    for (let [,replace] of TT.config.regexReplacers) {
+        let token = "{+" + count + "+}"
+        text = text.replaceAll(token, replace);
+        count++;
     }
     return text;
 }
