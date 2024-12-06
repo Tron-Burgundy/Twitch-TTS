@@ -1213,22 +1213,27 @@
               <button class="button is-success" id="replacetermbtn"><span class="icon"><i class="fas fa-check"></i></span></button>
             </div>
             <div class="is-flex is-align-items-center is-flex-shrink-1">
-              <div class="is-flex">
-                <input class="mx-2" id="pany" type="radio" name="pos" checked value="A">
+              <div class="is-flex" title="Can be anywhere even inside other words">
+                <input class="mx-2" id="pany" type="radio" name="pos" checked value="*">
                 <label class="label" for="pany">anywhere</label>
               </div>
-              <div class="is-flex">
+              <div class="is-flex" title="Term must be alone not touching other words e.g.">
+                <input class="mx-2" id="palone" type="radio" name="pos" value="A">
+                <label class="label" for="palone">alone</label>
+              </div>
+              <div class="is-flex" title="Only alone or starts a word e.g. 'fat' would match 'father'">
                 <input class="mx-2" id="pstart" type="radio" name="pos" value="S">
                 <label class="label" for="pstart">start</label>
               </div>
-              <div class="is-flex">
+              <div class="is-flex" title="Matches at the end of words e.g. 'her' would match 'father'">
                 <input class="mx-2" id="pend" type="radio" name="pos" value="E">
                 <label class="label" for="pend">end</label>
               </div>
-              <div class="is-flex">
+              <div class="is-flex" title="Replaces whole words if the term is part of it
+e.g. 'bum' would mean all of 'bumface' or 'fattybumbatty' would be replaced
+with it off it would become 'face'">
                 <input class="ml-4 mr-2" id="wholeword" type="checkbox">
-                <label class="label" for="wholeword" title="Replaces whole words if the term is part of it
-e.g. 'bum' with whole word replaces all of bumface or fattybumbatty">replace whole word</label>
+                <label class="label" for="wholeword">replace all</label>
               </div>
             </div>
           </div>
@@ -1244,7 +1249,7 @@ e.g. 'bum' with whole word replaces all of bumface or fattybumbatty">replace who
           <div class="hide-buttons" id="replaceTagPool"></div>
         </div>
         <div class="is-hidden">
-          <input class="input form-save" id="replace" type="text" data-to="replaceTerms" data-type="replacers" value="a rude thing(you mucky swine--A)">
+          <input class="input form-save" id="replace" type="text" data-to="replaceTerms" data-type="replacers" value="https://(blah~blah~linky~link--SW)http://(linky~link~blah--SW)a~rude~word(you~mucky~swine!--*W)">
         </div>
       </div>
     </div>

@@ -118,7 +118,7 @@ function to_term_replace_string(terms) {
     let repRgx = new RegExp(rgxStr, "g");
 
     for (let termSet of terms) {
-
+console.log("GOT TERMSET", termSet);
         let termF = termSet.term.replace(repRgx, " ").split(" ").filter(x=>x).join(SPACE_REPLACE).trim();
         if (!termF.length) continue;
             // value can be nothing
@@ -140,12 +140,10 @@ export function replace_term_populate(term) {
             gid("replacewith").value = t.to;
             gid("wholeword").checked = t.options.includes("W");
             let pos = t.options[0];
-            switch(pos) {
-                case "A": pos = "pany"; break;
-                case "S": pos = "pstart"; break;
-                case "E": pos = "pend"; break;
+            for (let p of document.getElementsByName("pos")) {
+                if (p.value === pos) {p.checked = true; break;}
             }
-            gid(pos).checked = true;
+
             break;
         }
     }

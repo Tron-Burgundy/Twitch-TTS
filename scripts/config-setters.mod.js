@@ -195,25 +195,33 @@ function regex_from_replacers(repArr) {
         term = regex_escape(term);
 
         switch (pos) {
-            case "A":   // anywhere
+            case "*":   // anywhere
                 if (wholeWord)
-                    rgxString = `\\b\\w*${term}\\w*\\b`;
+                    rgxString = `\\b\\B*${term}\\B*\\b`;
                 else
                     rgxString = term;
                 break;
 
+            case "A":   // alone
+                rgxString = `\\b${term}\\b`;
+
             case "S":   // start
                 if (wholeWord)
-                    rgxString = `\\b${term}\\w*`;
+                    rgxString = `\\b${term}\\S*`;
                 else
                     rgxString = `\\b${term}`
                 break;
+
             case "E":   // end
                 if (wholeWord)
-                    rgxString = `\\w*${term}\\b`;
+                    rgxString = `\\S*${term}\\b`;
                 else
                     rgxString = `${term}\\b`;
                 break;
+
+            default:
+                console.error("ERROR: Unknown regex position:", pos);
+                continue;
         }
 
         let rgx = new RegExp(rgxString, "ig");
