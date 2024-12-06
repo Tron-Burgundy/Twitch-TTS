@@ -90,6 +90,8 @@ export function init_tag_pools() {
         toast("Loaded <strong>" + e.detail.userCaps + "</strong>", "is-warning");
         if (e.detail.userCaps === undefined) console.log("UNDEFINED", e.detail);
         user_things_populate(e.detail.userCaps);
+        gid("replaceterm").value = e.detail.userCaps;
+        gid("replacewith").value = "";
     });
 
         // add emit types to pools - tags will emit their delete username with that type

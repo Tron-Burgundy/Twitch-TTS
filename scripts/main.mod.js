@@ -6,6 +6,8 @@
 window.TT = window.TT ?? {};
 const JANKED = window.location.hostname == "127.0.0.1" || "localhost" ? true : false;    // a percentage could also be added
 
+window._j = JANKED;
+
 import Emitter from "./classes/emitter.class.js"
 import "./widget-init.mod.js";
 import "./tmi/twitch-message-distributor.mod.js";
@@ -115,7 +117,7 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
 
     if (JANKED) {
         let vCmd = hasVoiceCmd.voiceCmd ?? TT.config.userAutoVoices[pack.userLower];
-        if (TT.config.autoVoiceMap[vCmd])//vCmd)  // the default "undefined" indexed voice never gets text added
+        if (vCmd && TT.config.autoVoiceMap[vCmd])//vCmd)  // the default "undefined" indexed voice never gets text added
             TT.config.autoVoiceMap[vCmd].text = pack.message;
     }
 
