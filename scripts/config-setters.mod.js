@@ -197,7 +197,7 @@ function regex_from_replacers(repArr) {
         switch (pos) {
             case "*":   // anywhere
                 if (wholeWord)
-                    rgxString = `\\b\\B*${term}\\B*\\b`;
+                    rgxString = `\\b\\S*${term}\\S*\\b`;
                 else
                     rgxString = term;
                 break;
