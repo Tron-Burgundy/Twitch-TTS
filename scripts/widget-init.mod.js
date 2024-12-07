@@ -17,7 +17,6 @@ TT.show_modal = show_modal;	// add as a "global" function
 TT.hide_modal = hide_modal;
 
 
-//docReady(init_components);
 window.addEventListener('load', init_components);
 
     // Bulma items initialisation
@@ -73,14 +72,14 @@ function init_modals() {
 }
 
 function show_modal(id) {
-    console.log("DO SHOW FOR", id);// EDGE sometimes stops doing the click but if I do this it's fine
+    //console.log("DO SHOW FOR", id);// EDGE sometimes stops doing the click but if I do this it's fine
     let modal = gid(id);
     modal.classList.add('is-active');
     html.classList.add('is-clipped');	// stops background scrolling with mouse
 }
 
 function hide_modal(id) {
-    console.log("DO HIDE FOR", id);
+    //console.log("DO HIDE FOR", id);
     html.classList.remove('is-clipped');	// stops background scrolling with mouse
     let modal = gid(id);
     modal?.classList.remove('is-active');
@@ -183,23 +182,23 @@ function _discover_tabsets() {
 }
 
     /**
-     * Delete buttons set data-target="selector" so use #elementId
+     * Delete buttons use data-target="selector" so use #elementId
+     * adds is-hidden to the element so is
+     * NOT for close_modal.  use .modal-dismiss for those.
+     * This adds is-hidden to the elements
      */
 
 function init_delete_buttons() {
-    var delBtns = qsa('button.delete');
+    var delBtns = qsa('button.delete[data-target]');
 
     delBtns.forEach( btn => {
-        //if (btn.dataset?.target) {
-        if (btn.dataset?.target) {
-            let targets = qsa(btn.dataset.target);
-            if (targets.length) {
-                btn.addEventListener('click', () => {                    // targets.forEach(t => t.classList.add('is-hidden'));                    // targets.forEach(t => t.classList.remove('is-active'));
-                    for (let t of targets) {
-                        hide_modal(t.id);
-                    }
-                })
-            }
+        let targets = qsa(btn.dataset.target);
+        if (targets.length) {
+            btn.addEventListener('click', () => {
+                for (let t of targets) {
+                    t.classList.add("is-hidden");
+                }
+            })
         }
     });
 }
@@ -222,7 +221,7 @@ function init_mobile_view_buttons() {
     });
 }
 
-let mobViewItems = document.querySelectorAll('.not-miniview, .navbar');
+/* let mobViewItems = document.querySelectorAll('.not-miniview, .navbar');
 TT.mini_view_on = mini_view_on; // make function 'public'
 // on = bool
 function mini_view_on(on) {
@@ -234,7 +233,7 @@ function mini_view_on(on) {
         mobViewItems.forEach(i => i.classList.remove('is-hidden'));
     }
 }
-
+ */
 
 
 // GLOBAL this looks for all buttons and adds the confirm thingy

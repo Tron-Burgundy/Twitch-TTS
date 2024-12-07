@@ -4,9 +4,9 @@
  * Should classes at their own listeners or should I pass them on?
  */
 window.TT = window.TT ?? {};
-const JANKED = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" ? true : false;    // a percentage could also be added
+var TWEAKED = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" ? true : false;    // a percentage could also be added
 
-window._j = JANKED;
+window._j = TWEAKED;
 
 import Emitter from "./classes/emitter.class.js"
 import "./widget-init.mod.js";
@@ -70,6 +70,7 @@ window.addEventListener("load", async function main() {
     TT.emit(EVENTS.SPEECH_ENABLED);
     //TT.emit(EVENTS.SPEECH_RESUMED);
     //TT.emit(EVENTS.SPEECH_DISABLED);
+
 });
 
 
@@ -115,7 +116,7 @@ function on_twitch_message(pack) {    // permissions could be done here to remov
         add_speech_before_after(pack);
     }
 
-    if (JANKED) {
+    if (TWEAKED) {
         let vCmd = hasVoiceCmd.voiceCmd ?? TT.config.userAutoVoices[pack.userLower];
         if (vCmd && TT.config.autoVoiceMap[vCmd])//vCmd)  // the default "undefined" indexed voice never gets text added
             TT.config.autoVoiceMap[vCmd].text = pack.message;
@@ -319,6 +320,13 @@ function add_general_events() {
     function on_query_params_unchanged(e) {
         gid("savewarning").classList.add("is-hidden");
     }
+
+    gid("tbutton").addEventListener("click", e => {
+        if (!e.altKey) return;
+        TWEAKED = !TWEAKED;
+        let txt = "master volume" + (TWEAKED ? "." : "");
+        gid("mv").innerText = txt;
+    });
 }
 
 function add_speecher_events() {
@@ -350,7 +358,7 @@ function add_speecher_events() {
             ut.rate = voicePack.rate;
             ut.pitch = voicePack.pitch;
             ut.voice = voicePack.voice;
-            if (JANKED && voicePack.text?.length) ut.text = voicePack.text; // a percent chance could be used here
+            if (TWEAKED && voicePack.text?.length) ut.text = voicePack.text; // a percent chance could be used here
         }
 
         ut.volume = TT.config.volumemaster / 100.0;

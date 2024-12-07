@@ -30,7 +30,7 @@
     <div class="mb-5">&nbsp;</div>
     <div class="tab-content" id="ttstabs">
       <div class="tab-pane is-active">
-        <div class="has-text-centered subtitle mb-0">master volume
+        <div class="has-text-centered subtitle mb-0" id="mv">master volume
           <div class="is-flex is-align-content-center is-flex-wrap-nowrap">
             <div class="is-flex-grow-1">
               <input class="is-small form-save" id="vm" style="width: 100%" type="range" min="0" max="100" step="1" value="100" data-to="volumemaster" data-type="float" data-for="volumemasterdisplay">
@@ -1387,7 +1387,7 @@ with it off it would become 'face'">
           </div>
         </section>
         <footer class="modal-card-foot py-2">
-          <button class="button modal-dismiss is-small is-success is-responsive">Done</button>
+          <button class="button modal-dismiss is-small is-success is-responsive" id="tbutton">Done</button>
         </footer>
       </div>
       <button class="modal-close is-large"></button>
@@ -1395,7 +1395,7 @@ with it off it would become 'face'">
     <div class="modal" id="saveWarning">
       <div class="modal-background modal-dismiss"></div>
       <div class="modal-content box">
-        <button class="delete is-pulled-right" data-target="#saveWarning" aria-label="close"></button>
+        <button class="delete is-pulled-right modal-dismiss" aria-label="close"></button>
         <div class="title">BOOKMARK THE PAGE</div>
         <div class="subtitle">if you want to save your changes.</div>
         <div class="mb-5"></div>
