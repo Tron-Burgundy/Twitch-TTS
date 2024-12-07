@@ -29,6 +29,8 @@ const FORM_EVENT_HANDLERS_INITIAL = [
     {selector: ".voice-select", event: 'change', function: on_voice_test_btn_click, params: {}},
         // save button in the save warning modal
     {selector: ".savecookie", event: "click", function: save_params_cookie, params: {}},
+        // tabs will clear the tag deletes
+    {selector: "[data-target='#ttstabs'] ul", event: "click", function: uncheck_tag_delete_boxes, params: {}},
     //     {selector: '#loglabel', event: 'click', function: () => log('', true), params: {}},
 ];
 
@@ -145,6 +147,17 @@ function on_voice_test_btn_click(e) {
 }
 
 
+    // unsets the cleckboxes for all - delete buttons - set on top nav buttons click
+
+function uncheck_tag_delete_boxes() {
+    let buttons = qsa(".hide-button-toggle");
+    let change = new Event("change");
+
+    for (let btn of buttons) {
+        btn.checked = false;
+        btn.dispatchEvent(change);
+    }
+}
 
 
 

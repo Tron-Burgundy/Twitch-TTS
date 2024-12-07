@@ -81,9 +81,9 @@ function show_modal(id) {
 
 function hide_modal(id) {
     console.log("DO HIDE FOR", id);
-    let modal = gid(id);
-    modal.classList.remove('is-active');
     html.classList.remove('is-clipped');	// stops background scrolling with mouse
+    let modal = gid(id);
+    modal?.classList.remove('is-active');
 }
 
     /**
@@ -191,11 +191,13 @@ function init_delete_buttons() {
 
     delBtns.forEach( btn => {
         //if (btn.dataset?.target) {
-        if (btn.dataset && btn.dataset.target) {
+        if (btn.dataset?.target) {
             let targets = qsa(btn.dataset.target);
             if (targets.length) {
-                btn.addEventListener('click', () => {
-                    targets.forEach(t => t.classList.add('is-hidden'));
+                btn.addEventListener('click', () => {                    // targets.forEach(t => t.classList.add('is-hidden'));                    // targets.forEach(t => t.classList.remove('is-active'));
+                    for (let t of targets) {
+                        hide_modal(t.id);
+                    }
                 })
             }
         }

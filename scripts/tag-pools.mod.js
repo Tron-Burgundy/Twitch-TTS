@@ -1,32 +1,20 @@
-/* tags have CAP CASED data-user
+/* tags have user-lower and user-caps
 
- Nickname / autvoices have an associated hidden form field
+Nickname / autvoices have an associated hidden form field
 TheUserName(The~Nick~Name)OtherUser(Nikky)
 
 We want to preserve the case for this when saving even though the keys are lower case (caused by onchange)
 
-easy way
-parse to an object
-    parse_equal_pairs_from_url
-add/delete the key we want (key cased)
-set value of field with
-    form_out_not_needed_equal_pairs_to_url
-
-trigger onchange
-
-    EMIT userignored and userunignored where necessary
-Ignored users
-split to array
-
+EMIT userignored and userunignored where necessary
 */
 
+import EVENTS from "./event-constants.mod.js";
 import { parse_key_value_string, to_key_value_string, split_to_array } from "./form-inout-filters.mod.js";
 import { SPACE_REPLACE } from "./config.mod.js";
-import EVENTS from "./event-constants.mod.js";
 import { voiceCmdSelect } from "./voice-selects-setup.mod.js";
 import { parse_term_replace_string, replace_term_populate } from "./replace-terms.mod.js";
 
-cclog("HEYYYYYYYYYYYYYYYY Tag Pools.mod LOADED AGAIN", "m");
+cclog("HEYYYYYYYYYYYYYYYY Tag Pools.mod LOADED", "m");
 
 var initialised = false;
 
@@ -85,7 +73,7 @@ export function init_tag_pools() {
 
     TT.emitter.on(EVENTS.USER_ALWAYS_ALLOWED, on_allow_user);
     TT.emitter.on(EVENTS.USER_IGNORED, on_ignore_user);
-        // clicking a message row transfers their name to the nickname page.
+        // clicking a message row transfers their name to the nickname page and replace term
     TT.emitter.on(EVENTS.MESSAGE_ROW_CLICK, e => {
         toast("Loaded <strong>" + e.detail.userCaps + "</strong>", "is-warning");
         if (e.detail.userCaps === undefined) console.log("UNDEFINED", e.detail);
@@ -105,7 +93,7 @@ export function init_tag_pools() {
     gid("ignoredTagPool").dataset["emit"] = EVENTS.USER_UNIGNORED;
 
     gid("replaceTagPool").dataset["emit"] = EVENTS.REPLACE_REMOVED;
-    gid("replaceTagPool").dataset["type"] = "replaceterm";
+    gid("replaceTagPool").dataset["type"] = "replaceterm";  // type is checked in on_tag_click
 
         ////////// EVENT LISTENERS //////////
         ////////// EVENT LISTENERS //////////
@@ -135,17 +123,17 @@ export function init_tag_pools() {
 
     gid("username").addEventListener("keyup", x => {
         if (x.key === "Enter") {
-            user_data_change();
+            nickname_voice_submit_handler();
         }
     });
     gid("nickname").addEventListener("keyup", x => {
         if (x.key === "Enter") {
-            user_data_change();
+            nickname_voice_submit_handler();
         }
     });
 
-    gid("updateuser").addEventListener("click", user_data_change);
-    gid("voicecommand").addEventListener("change", user_data_change);
+    gid("updateuser").addEventListener("click", nickname_voice_submit_handler);
+    gid("voicecommand").addEventListener("change", nickname_voice_submit_handler);
 }
 
 //);
@@ -155,7 +143,7 @@ export function init_tag_pools() {
      * @returns
      */
 
-function user_data_change() {//console.log("CHAAAAAAAAAAAAAAAAAAANGE");
+function nickname_voice_submit_handler() {//console.log("CHAAAAAAAAAAAAAAAAAAANGE");
     let userCaps = to_username( gid("username").value );
 
     gid("username").value = userCaps;
@@ -183,7 +171,6 @@ function user_data_change() {//console.log("CHAAAAAAAAAAAAAAAAAAANGE");
 }
 
 
-
     /**
      * sets up a change on checkboxes that will show and hide delete buttons
      */
@@ -198,19 +185,7 @@ function delete_checkboxes_init() {
                 gid(toggleOn).classList.add("show-buttons");
             else
                 gid(toggleOn).classList.remove("show-buttons");
-    });
-    }
-}
-
-        // unsets the cleckboxes for all - delete buttons - set on top nav buttons click
-
-function uncheck_tag_delete_boxes_clear() {
-    let buttons = qsa(".hide-button-toggle");
-    let change = new Event("change");
-
-    for (let btn of buttons) {
-        btn.checked = false;
-        btn.dispatchEvent(change);
+        });
     }
 }
 
@@ -362,19 +337,13 @@ function create_replacer_pool(poolId, inputFieldId, separator = ": ") {
     remove_children(pool);
         // parse the key pair string, turn to array and sort by key
     let terms = parse_term_replace_string(data);
-    // let pairObj = parse_key_value_string(data);
     let entries = terms.sort( (a,b) => a.term.localeCompare(b.term));
-    //Object.entries(pairObj).sort((a,b) => a[0].localeCompare(b[0]));
 
-    for (let termset of entries) {
-        //let value = pairObj[prop];
-        let text = termset.term + separator + termset.to;
+    for (let {term, to} of entries) {
+        let text = term + separator + to;
 
         let tag = create_tag(text);
-        tag.dataset["term"] = termset.term;
-        // tag.dataset["userCaps"] = userCaps;
-        // tag.dataset["value"] = value;
-        // tag.dataset["from"] = inputFieldId;
+        tag.dataset["term"] = term;
 
         let delBtn = create_tag_del_button();
         tag.append(delBtn);
@@ -454,14 +423,13 @@ function add_to_complex_shadow_field(userCaps, value, targetId) {
     let userLower = userCaps.toLowerCase();
     let field = gid(targetId);
     let currUsers = parse_key_value_string(field.value);
-    //console.log("ADDING TO THIS THING,", currUsers);
 
         // delete a current key if it's the same.  They may want a case change
 
     for (let user in currUsers) {
         if (user.toLowerCase() === userLower) {
             delete currUsers[user];
-            // break; in case multiples get in
+            // break; no, in case multiples get in
         }
     }
 

@@ -181,15 +181,14 @@ function regex_term_replace(text) {
     let tokens = [];
     let count = 0;
     for (let [rgx, replace] of TT.config.regexReplacers) {
-        //text = text.replace(rgx, replace);
-        let token = "{+" + count + "+}";
+        //text = text.replace(rgx, replace); // originally
+        let token = "¬~" + count + "~¬";
         text = text.replace(rgx, token);
-        // tokens.push(replace);
         count++;
     }
     count = 0;
     for (let [,replace] of TT.config.regexReplacers) {
-        let token = "{+" + count + "+}"
+        let token = "¬~" + count + "~¬"
         text = text.replaceAll(token, replace);
         count++;
     }
@@ -357,21 +356,7 @@ function add_speecher_events() {
         ut.volume = TT.config.volumemaster / 100.0;
     });
 
-  /*   function username_to_voice_command(username) {
-        return TT.config.userAutoVoices[username.toLowerCase()];
-    }
-        // don't allow the default "undefined" voice
-    function username_to_voice_settings(username) {
-        let vCmd = username_to_voice_command(username.toLowerCase());
-        return TT.config.autoVoiceCmd[ vCmd ];
-    }
 
-    function on_speech_started(e) {
-        //console.log("STARTED", e.detail);
-        //    gid("speechqueuesaying").innerHTML = '<span class="tag is-info">Saying: </span> : ' + e.detail.utterance.customdata.message;
-        //end: e => { gid("speechqueuesaying").innerText = "Idle..."; },
-    }
-*/
     function on_speech_ended(e) {
         msgDisp.speech_queue_entry_to_old_messages(e.detail.messageid);//, "ended", "link");
     }
@@ -398,7 +383,6 @@ function add_speecher_events() {
     function on_speech_cancelled(e) {
         msgDisp.speech_queue_entry_to_old_messages(e.detail.messageid, "Cancelled", "warning");
     }
-
 }
 
 function add_twitch_moderation_events() {
@@ -419,7 +403,7 @@ function add_twitch_moderation_events() {
     /* TT.emitter.on(EVENTS.TWITCH_CHAT_CLEARED, e => {
         let {channel, "room-id": roomid, "tmi-sent-ts": time} = e.detail;
     }); */
-        // timeouts happen before a ban but with duraction undefined
+        // timeouts happen before a ban but with duration undefined
     TT.emitter.on(EVENTS.TWITCH_TIMEOUT, e => {
         if (e.detail.duration === undefined) return; // it's a ban
         let {channel, username, duration, userid, "room-id": roomid, "tmi-sent-ts": time} = e.detail;

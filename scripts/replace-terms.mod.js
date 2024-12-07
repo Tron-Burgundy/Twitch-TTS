@@ -63,8 +63,6 @@ function replace_term_submit_handler() {
     let wholeWord = gid("wholeword").checked ? "W" : "";
     options += wholeWord;
 
-    //console.log("replace", term);    console.log("with", to);    console.log("position", options);
-
     let termset = {term, to, options};
 
     TT.emit(EVENTS.REPLACE_ADDED, termset);
@@ -118,7 +116,7 @@ function to_term_replace_string(terms) {
     let repRgx = new RegExp(rgxStr, "g");
 
     for (let termSet of terms) {
-console.log("GOT TERMSET", termSet);
+
         let termF = termSet.term.replace(repRgx, " ").split(" ").filter(x=>x).join(SPACE_REPLACE).trim();
         if (!termF.length) continue;
             // value can be nothing
@@ -160,7 +158,6 @@ window._toreplacer = to_term_replace_string;
 
 
 function add_to_replace_shadow_field(termSet, targetId) {
-    // termCaps = to_username(userCaps);
     let field = gid(targetId);
     let term = termSet.term;
 

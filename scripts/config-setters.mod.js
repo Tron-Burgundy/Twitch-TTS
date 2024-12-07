@@ -78,15 +78,11 @@ function set_conf_int(e) {	//verify_data_varname(e);
 
     if (e.target.max) {
         let m = parseInt(e.target.max);
-        if (i > m) {
-            i = m;
-        }
+        if (i > m) i = m;
     }
     if (e.target.min) {
         let m = parseInt(e.target.min);
-        if (i < m) {console.log("to int less min");
-            i = m;
-        }
+        if (i < m) i = m;
     }
         // update original if it's a wrongun
     if (i.toString() !== valOrig) e.target.value = i.toString();
@@ -106,16 +102,12 @@ function set_conf_float(e) {	//verify_data_varname(e);
 
     if (e.target.max) {
         let m = parseFloat(e.target.max);
-        if (i > m) {
-            i = m;
-        }
+        if (i > m) i = m;
     }
 
     if (e.target.min) {
         let m = parseFloat(e.target.min);
-        if (i < m) {
-            i = m;
-        }
+        if (i < m) i = m;
     }
 
     if (i.toString() !== valOrig) e.target.value = i.toString();
@@ -180,6 +172,13 @@ function lower_case_object_props(obj) {
     return Object.keys(obj).reduce( reduceFunc, {});    // starts with empty object
 }
 
+
+    /**
+     * Converts strings of replacers into actual regular expressions
+     * Used in set_conf_replacers()
+     * @param {Array[object {term, to, replace},]} repArr
+     * @returns array of [regex, string to replace]
+     */
 
 function regex_from_replacers(repArr) {
     let res = [];
