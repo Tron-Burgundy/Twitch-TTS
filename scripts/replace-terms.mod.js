@@ -13,7 +13,7 @@ import { SPACE_REPLACE } from "./config.mod.js";
 import { trigger_onchange } from "./tag-pools.mod.js";
 import { create_tag_pools } from "./tag-pools.mod.js";
 
-const OPTION_SPLIT = "--";    // !~.()_*'-
+
 let replacersInitialised = false;
 
 export const REPLACE_EVENTS = [
@@ -84,14 +84,21 @@ function replace_term_submit_handler() {
      * @returns object
      */
 
+const REPLACE_TERM_SPLIT1 = "!.!";
+const REPLACE_TERM_SPLIT2 = "--";
+const OPTION_SPLIT = "__";    // !~.()_*'-
+const REPLACE_TERM_SPLIT3 = "";
+
 export function parse_term_replace_string(pString, target) {
     let arr = [];
-    let splits1 = pString.split(")") ;
-
+    let splits1 = pString.split(REPLACE_TERM_SPLIT1) ;
+console.log("SPLITS", splits1);
     for(let p of splits1) {
         if (!p.length) continue;
 
-        let [term, valNOptions] = p.split("(");
+        let [term, valNOptions] = p.split(REPLACE_TERM_SPLIT2);
+console.log("term, options", term, valNOptions);
+        if (!valNOptions) continue;
 
         let [to, options] = valNOptions.split(OPTION_SPLIT);
 
@@ -109,9 +116,10 @@ export function parse_term_replace_string(pString, target) {
      * @param {Array} terms {term: {value, options}
      */
 
-function to_term_replace_string(terms) {
+export function to_term_replace_string(terms) {
     let set = [];
-    let rgxStr = `(\\(|\\)|${SPACE_REPLACE}|${OPTION_SPLIT})`;
+    // let rgxStr = `(\\(|\\)|${SPACE_REPLACE}|${OPTION_SPLIT})`;
+    let rgxStr = `(${SPACE_REPLACE}|${OPTION_SPLIT})`;
     //console.log("REGEX STRING:", rgxStr);
     let repRgx = new RegExp(rgxStr, "g");
 
@@ -123,7 +131,7 @@ function to_term_replace_string(terms) {
         let valueF = termSet.to.replace(repRgx, " ").split(" ").filter(x=>x).join(SPACE_REPLACE).trim();
         let options = termSet.options;
 
-        let s = termF + "(" + valueF + OPTION_SPLIT + options + ")";
+        let s = termF + REPLACE_TERM_SPLIT2 + valueF + OPTION_SPLIT + options + REPLACE_TERM_SPLIT1;
 
         set.push(s);
     }

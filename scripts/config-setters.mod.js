@@ -191,10 +191,10 @@ function regex_from_replacers(repArr) {
         let rgxString = "";
         let wholeWord = set.options.includes("W");
 
-        term = regex_escape(term);
+        if (pos !== "R") term = regex_escape(term);
 
         switch (pos) {
-            case "*":   // anywhere
+            case "G":   // anywhere
                 if (wholeWord)
                     rgxString = `\\b\\S*${term}\\S*\\b`;
                 else
@@ -218,14 +218,23 @@ function regex_from_replacers(repArr) {
                     rgxString = `${term}\\b`;
                 break;
 
+            case "R":   // an actual regex
+                rgxString = term;
+                break;
+
             default:
                 console.error("ERROR: Unknown regex position:", pos);
                 continue;
         }
 
         let rgx = new RegExp(rgxString, "ig");
-
+console.log("REGEX:", rgx);
         res.push([rgx, set.to]);
+
+        /*
+            If I want to add more complex regex like (a|b|c) then I'll have to abandon the encoding scheme for this
+            field which isn't actually that bad.
+        */
 
         //term = term.replace(/\\/g, "\\\\"); // backslash to real backslash
         //term = term.replace(/\./g, "\\.");  // dot to real dot

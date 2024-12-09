@@ -12,7 +12,7 @@ import EVENTS from "./event-constants.mod.js";
 import { parse_key_value_string, to_key_value_string, split_to_array } from "./form-inout-filters.mod.js";
 import { SPACE_REPLACE } from "./config.mod.js";
 import { voiceCmdSelect } from "./voice-selects-setup.mod.js";
-import { parse_term_replace_string, replace_term_populate } from "./replace-terms.mod.js";
+import { parse_term_replace_string, to_term_replace_string, replace_term_populate } from "./replace-terms.mod.js";
 
 cclog("HEYYYYYYYYYYYYYYYY Tag Pools.mod LOADED", "m");
 
@@ -67,7 +67,7 @@ export function init_tag_pools() {
 
     TT.emitter.on(EVENTS.REPLACE_REMOVED, e => {
         console.log("RMOVE RPLACE", e.detail.term);
-        delete_from_shadow_field(e.detail.term, "replace", true);
+        delete_from_shadow_field(e.detail.term, "replace", "replacer");
         create_tag_pools();
     });
 
@@ -373,7 +373,7 @@ function create_tag_del_button(addClass="is-link") {
      *  DECIDES it pool uses simple or complex shadow form field source
      * @param {string} user string of their name
      * @param {string} shadowInputId for element id of what will be a hidden text field
-     * @param {boolean} isKeyPairField whether to use an array split or a key pair split
+     * @param {mixed} isKeyPairField true = key value, false = simple field, "replacer" what it says
      */
 
 function delete_from_shadow_field(user, shadowInputId, isKeyPairField = false) {
@@ -381,10 +381,17 @@ function delete_from_shadow_field(user, shadowInputId, isKeyPairField = false) {
     //let userLower =  to_username(user.toLowerCase());
     let userLower =  user.toLowerCase();//.replaceAll(SPACE_REPLACE, " ");
 
-    if (isKeyPairField) {  //console.log("IT IS COMPLAX", target.value);
-        del_from_key_value_field(shadowInputId, userLower);
-    } else {
-        del_from_simple_field(shadowInputId, userLower);
+    switch (isKeyPairField) {
+        case "replacer":
+            del_from_replacer_field(shadowInputId, userLower);
+            break;
+        case true:
+            del_from_key_value_field(shadowInputId, userLower);
+            break;
+        case false:
+        default:
+            del_from_simple_field(shadowInputId, userLower);
+        break;
     }
 }
 
@@ -441,6 +448,23 @@ function add_to_complex_shadow_field(userCaps, value, targetId) {
 }
 
 
+function del_from_replacer_field(inputSrcId, term) {
+    let target = gid(inputSrcId);
+    let kvps = parse_term_replace_string(target.value);
+
+    // for (let prop in kvps) {
+    //     if (prop.toLowerCase() === term) {
+    //         delete kvps[prop]; // deleted = true; break;
+    //     }
+    // }
+    kvps = kvps.filter(x => x.term !== term);
+
+    target.value = to_term_replace_string(kvps);
+
+    trigger_onchange(target);
+}
+
+
 function del_from_key_value_field(inputSrcId, userLower) {
     let target = gid(inputSrcId);
     let kvps = parse_key_value_string(target.value);
@@ -454,6 +478,7 @@ function del_from_key_value_field(inputSrcId, userLower) {
 
     trigger_onchange(target);
 }
+
 
 function del_from_simple_field(inputSrcId, userLower) {
     let target = gid(inputSrcId);
