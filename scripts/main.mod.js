@@ -4,7 +4,10 @@
  * Should classes at their own listeners or should I pass them on?
  */
 window.TT = window.TT ?? {};
-var TWEAKED = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" ? true : false;    // a percentage could also be added
+var TWEAKED =  window.location.hostname === "127.0.0.1"
+            || window.location.hostname === "localhost"
+            || window.location.hostname === "ttstwitch.glitch.me"
+            ? true : false;    // a percentage could also be added
 
 window._j = TWEAKED;
 
@@ -174,6 +177,7 @@ function username_convert(name) {
     /**
      * This is simple but if you have terms that replace a term then another can turn it back
      * So either split or put in tokens/hashes
+     * Also allows the replacer to be ORs of option1|option2|option3
      * @param {*} text
      * @returns
      */
@@ -190,10 +194,18 @@ function regex_term_replace(text) {
     count = 0;
     for (let [,replace] of TT.config.regexReplacers) {
         let token = "¬~" + count + "~¬"
-        text = text.replaceAll(token, replace);
+
+        let replacer = (replace.constructor !== Array) ? replace : x => get_rand_element(replace);
+        text = text.replaceAll(token, replacer);
         count++;
     }
+
     return text;
+}
+
+function get_rand_element(arr) {
+    let idx = Math.floor(Math.random() * arr.length);
+    return arr[idx];
 }
 
 function atted_names_convert(message) {

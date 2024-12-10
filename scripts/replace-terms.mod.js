@@ -92,12 +92,12 @@ const REPLACE_TERM_SPLIT3 = "";
 export function parse_term_replace_string(pString, target) {
     let arr = [];
     let splits1 = pString.split(REPLACE_TERM_SPLIT1) ;
-console.log("SPLITS", splits1);
+
     for(let p of splits1) {
         if (!p.length) continue;
 
         let [term, valNOptions] = p.split(REPLACE_TERM_SPLIT2);
-console.log("term, options", term, valNOptions);
+
         if (!valNOptions) continue;
 
         let [to, options] = valNOptions.split(OPTION_SPLIT);

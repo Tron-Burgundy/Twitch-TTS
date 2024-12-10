@@ -157,6 +157,7 @@ function set_conf_replacers(e) {
     let parsed = parse_term_replace_string(e.target.value);
         // really I need to create regexes
     TT.set_conf(e.target.dataset.to, parsed);
+    // to values will be split into arrays if they're split with |
     TT.config.regexReplacers = regex_from_replacers(parsed);
 }
 
@@ -229,7 +230,11 @@ function regex_from_replacers(repArr) {
 
         let rgx = new RegExp(rgxString, "ig");
 console.log("REGEX:", rgx);
-        res.push([rgx, set.to]);
+            // to will either be arrays or strings
+        let toArrOrStr = set.to.split("|").filter(x => x);
+        if (toArrOrStr.length < 2) toArrOrStr = set.to;
+
+        res.push([rgx, toArrOrStr]);
 
         /*
             If I want to add more complex regex like (a|b|c) then I'll have to abandon the encoding scheme for this
