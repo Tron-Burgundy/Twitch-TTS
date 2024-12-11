@@ -60,7 +60,21 @@ function replace_term_submit_handler() {
             break;
         }
     }
-    let wholeWord = gid("wholeword").checked ? "W" : "";
+
+    // check if a regex is valid
+
+    if (options === "R") {
+        try {
+            new RegExp(term, "ig");
+        } catch (error) {
+            console.error(error);
+            console.log(error.message);
+            toast("Error: " + error.message, "is-warning", 6000);
+            return;
+        }
+    }
+
+    let wholeWord = (gid("wholeword").checked && options !== "R") ? "W" : "";
     options += wholeWord;
 
     let termset = {term, to, options};
@@ -131,12 +145,12 @@ export function to_term_replace_string(terms) {
         let valueF = termSet.to.replace(repRgx, " ").split(" ").filter(x=>x).join(SPACE_REPLACE).trim();
         let options = termSet.options;
 
-        let s = termF + REPLACE_TERM_SPLIT2 + valueF + OPTION_SPLIT + options + REPLACE_TERM_SPLIT1;
+        let s = termF + REPLACE_TERM_SPLIT2 + valueF + OPTION_SPLIT + options;// + REPLACE_TERM_SPLIT1;
 
         set.push(s);
     }
 
-    return set.join("");
+    return set.join(REPLACE_TERM_SPLIT1);
 }
 
 export function replace_term_populate(term) {

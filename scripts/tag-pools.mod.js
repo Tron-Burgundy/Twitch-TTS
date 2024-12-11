@@ -383,7 +383,7 @@ function delete_from_shadow_field(user, shadowInputId, isKeyPairField = false) {
 
     switch (isKeyPairField) {
         case "replacer":
-            del_from_replacer_field(shadowInputId, userLower);
+            del_from_replacer_field(shadowInputId, user);   // stay cased
             break;
         case true:
             del_from_key_value_field(shadowInputId, userLower);
@@ -447,16 +447,17 @@ function add_to_complex_shadow_field(userCaps, value, targetId) {
     trigger_onchange(field);
 }
 
+    /**
+     * Term is being received as lower cased...
+     * @param {*} inputSrcId
+     * @param {*} term
+     */
+
 
 function del_from_replacer_field(inputSrcId, term) {
     let target = gid(inputSrcId);
     let kvps = parse_term_replace_string(target.value);
 
-    // for (let prop in kvps) {
-    //     if (prop.toLowerCase() === term) {
-    //         delete kvps[prop]; // deleted = true; break;
-    //     }
-    // }
     kvps = kvps.filter(x => x.term !== term);
 
     target.value = to_term_replace_string(kvps);

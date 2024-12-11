@@ -57,6 +57,7 @@ function dce(i) {
 
 toast_init();
 function toast_init(testToast = false) {
+
     function toast(message, type="is-info", duration = 4000, extras = {}) {
         bulmaToast.toast({ message, type, duration, ...extras });
     }

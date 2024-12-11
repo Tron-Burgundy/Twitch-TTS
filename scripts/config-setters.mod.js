@@ -228,8 +228,16 @@ function regex_from_replacers(repArr) {
                 continue;
         }
 
-        let rgx = new RegExp(rgxString, "ig");
-console.log("REGEX:", rgx);
+        let rgx;
+        try {
+            rgx = new RegExp(rgxString, "ig");
+        } catch (error) {
+            toast("The replace expression is invalid: " + term);
+            console.error(error);
+            continue;
+        }
+
+//console.log("REGEX:", rgx);
             // to will either be arrays or strings
         let toArrOrStr = set.to.split("|").filter(x => x);
         if (toArrOrStr.length < 2) toArrOrStr = set.to;
