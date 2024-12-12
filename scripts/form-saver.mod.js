@@ -63,14 +63,14 @@ export function query_string_from_inputs(selectors = '.form-save') {
 
 		if (value === null) continue;
 
-		 try {
-			uri.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
+		 try {	// I need to encode apostrophes to %27 of -_.!~*'()
+			uri.push(`${encodeURIComponent(name).replaceAll("'", "%27")}=${encodeURIComponent(value).replaceAll("'", "%27")}`);
 		 } catch (e) {
 			console.error("ERROR encoding URI Component:", e);
 		 }
 	};
 		// I could localstore_save() here NO - you've got one job.  url_populate does that
-	return uri.join('&');
+	return "?" + uri.join('&');
 }
 
 
@@ -222,7 +222,7 @@ export function url_populate(e) {
 
 	let urlParams = query_string_from_inputs();
 
-	urlParams = "?" + urlParams;
+	urlParams = urlParams;
 
 	if (window.location.search === urlParams) {//cclog("NO NEEDS", "g");
 		return;
