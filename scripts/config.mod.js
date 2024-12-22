@@ -2,10 +2,10 @@ import { to_key_value_string } from "./form-inout-filters.mod.js";
 
 TT.config = TT.config ?? {}
 
-const TMI_DEFAULT_CHANNELS = [];		// could put this in a different file for easy user use
+// const TMI_DEFAULT_CHANNELS = [];		// could put this in a different file for easy user use
 const TMI_ALLOWED_DEFAULT = ["VeryNiceChap"];		// these do work
 const TMI_IGNORE_DEFAULT = ["nightbot", "streamelements", "moobot", "streamlabs", "fossabot", "songlistbot"]; // LOWERCASE
-const TMI_NICKNAMES_DEFAULT = {Example:"Nickname Click Me"}
+const TMI_NICKNAMES_DEFAULT = {Example: "Nickname Click Me"}
 const TMI_AUTOVOICES_DEFAULT = {Example_2_click_me: "ex"}
 
 export const SPACE_REPLACE = "~";  // for others
@@ -47,9 +47,9 @@ export function set_form_defaults() {
 }
 
 TT.TTSVars = {       // more props added from forms
-    flashSetTimeout: null,
-    flashDuration: 3500,    // milliseconds
-    flashFunc: x => x,      // does nothing for now
+    // flashSetTimeout: null,
+    // flashDuration: 3500,    // milliseconds
+    // flashFunc: x => x,      // does nothing for now
 }
 
 

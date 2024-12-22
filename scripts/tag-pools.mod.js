@@ -75,9 +75,9 @@ export function init_tag_pools() {
     TT.emitter.on(EVENTS.USER_IGNORED, on_ignore_user);
         // clicking a message row transfers their name to the nickname page and replace term
     TT.emitter.on(EVENTS.MESSAGE_ROW_CLICK, e => {
-        toast("Loaded <strong>" + e.detail.userCaps + "</strong>", "is-warning");
+        toast("<strong>" + e.detail.userCaps + "</strong> selected", "is-warning");
         if (e.detail.userCaps === undefined) console.log("UNDEFINED", e.detail);
-        user_things_populate(e.detail.userCaps);
+        user_fields_populate(e.detail.userCaps);
         gid("replaceterm").value = e.detail.userCaps;
         gid("replacewith").value = "";
     });
@@ -214,7 +214,7 @@ function on_tag_click(e) {
                     replace_term_populate(dataset.term);
                     return;
                 }
-                user_things_populate(dataset.userCaps); // this may not be the case
+                user_fields_populate(dataset.userCaps); // this may not be the case
             break;
 
         default:
@@ -229,7 +229,7 @@ function on_tag_click(e) {
      * @param {string} user's name
      */
 
-export function user_things_populate(user) {
+export function user_fields_populate(user) {
     let userLower = user.toLowerCase().trim();
 
     let nickName = TT.config.nicknames[userLower] ?? "";

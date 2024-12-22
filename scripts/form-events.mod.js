@@ -58,9 +58,9 @@ function on_stop_go_click(e) {
 }
 
 function on_voice_command_change(e) {
-    let inVal = e.target.value
-    let out = "!" + inVal.replace(/\W/g, " ").trim().replace(/ /g, "_").toLowerCase();
-    e.target.value = out;
+    let vCmdIn = e.target.value;
+    let vCmdOut = "!" + vCmdIn.replace(/\W/g, " ").trim().replace(/ /g, "_").toLowerCase();// spaces to _
+    e.target.value = vCmdOut;
 
         // repopulate the voice command select
 
@@ -163,12 +163,14 @@ function uncheck_tag_delete_boxes() {
 
 function save_params_cookie(e) {
     e.stopPropagation();
-    setCookie("URLPARAMS", query_string_from_inputs());
+    // setCookie("URLPARAMS", query_string_from_inputs());
+    set_cookie_chunked("URLPARAMS", query_string_from_inputs());
     toast("Saved settings cookie", "is-link");
 }
 
 function load_params_cookie() {
-    let paramString = getCookie("URLPARAMS");
+    // let paramString = getCookie("URLPARAMS");
+    let paramString = get_cookie_chunked("URLPARAMS");
         // the problem here is that all values not stored in the params will stay at their current values
         // could set all the defaults first - it's sorted, all fields go to defaultValue or ""
     restore_form_values('.form-save', {paramString});
@@ -183,6 +185,7 @@ function load_params_cookie() {
     // great to see the most found get and set cookie funcs on the net are bad
     // I did a url encode of name and value, now let's cheapen that with a replace
     // going with the string replace so there's extra storage in the cookie
+    // the set cookie limit of 4097 includes the cookie name and = sign
 
 const repColonSpace = "¼Æþ";    // replaces "; " in names and values
 
@@ -191,7 +194,9 @@ function setCookie(cName, cValue, expDays = 1000) {
     date.setTime(date.getTime() + (expDays * 86400 * 1000));
     const expires = "expires=" + date.toUTCString();
     //document.cookie = encodeURIComponent(cName) + "=" + encodeURIComponent(cValue) + "; " + expires + "; path=/";
-    document.cookie = cName.replace("; ", repColonSpace) + "=" + cValue.replace("; ", repColonSpace) + "; " + expires + "; path=/";
+    let cookie = cName.replaceAll("; ", repColonSpace) + "=" + cValue.replaceAll("; ", repColonSpace);
+    // cclog("Cookie length: " + cName + " " + cookie.length, "y");
+    document.cookie = cookie + "; " + expires + "; path=/";
 }
 
     // returns undefined if not found
@@ -201,17 +206,84 @@ function getCookie(cName) {
     //cName = encodeURIComponent(cName);
     const eqPairs = document.cookie.split("; ");
 
-    for (let val of eqPairs) {
-        //let n = val.split("=", 1)[0];
-        let [n,v] = val.split("=");
+    for (let val of eqPairs) {        //let n = val.split("=", 1)[0];
+        let [n,] = val.split("=");
 
-        if (n === cName) {
-            //return decodeURIComponent(v);
-            return val.substring(n.length + 1).replace(repColonSpace, "; ");
+        if (n === cName) {            //return decodeURIComponent(v);
+            return val.substring(n.length + 1).replaceAll(repColonSpace, "; ");
+            //return v.join("=").replaceAll(repColonSpace, "; "); // either or
         }
     }
 
     return;
+}
+
+    /**
+     * Need a longer than 4k cookie?  Chunk it up and add numbers to the name
+     * scheme have cookie name + NumChunks
+     * 20 x 4097 cookies are permitted
+     * @param {*} name
+     * @param {*} value
+     */
+
+const COOKIE_CHUNKER_LENGTH = 4000; // give leeway of 4097 limit to allow for the name length
+const COOKIE_CHUNK_COUNT_SUFFIX = "NumChunks";
+const COOKIE_CHUNK_NUM_SUFFIX = "_CCHUNK_#";
+
+window._scChunk = set_cookie_chunked;
+window._gcChunk = get_cookie_chunked;
+window._ccClear = clear_cookie_chunked;;
+
+function set_cookie_chunked(name, value, expDays = 2000) {
+    // find out of other values exist first
+    let existingCount = getCookie(name + COOKIE_CHUNK_COUNT_SUFFIX);
+    if (existingCount) clear_cookie_chunked(name);
+        //
+    let totChunks = 1 + Math.floor( value.length / COOKIE_CHUNKER_LENGTH );
+        // could just set normal but do it chunked
+
+    setCookie(name + COOKIE_CHUNK_COUNT_SUFFIX, `${totChunks}`);
+
+    let chunk = 0;
+    while (chunk < totChunks) {
+        let start = chunk * COOKIE_CHUNKER_LENGTH;
+        let end = start + COOKIE_CHUNKER_LENGTH;
+        setCookie(name + COOKIE_CHUNK_NUM_SUFFIX + chunk, value.substring(start, end));
+        chunk++;
+    }
+}
+
+function get_cookie_chunked(name) {
+    let res = "";
+
+    let chunkCount = parseInt( getCookie(name + COOKIE_CHUNK_COUNT_SUFFIX) );
+    let chunk = 0;
+
+    while (chunk < chunkCount) {
+        res += getCookie(name + COOKIE_CHUNK_NUM_SUFFIX + chunk);
+        chunk++;
+    }
+
+    return res;
+}
+
+function clear_cookie_chunked(name) {
+    // if ( !cookie_chunked_exists(name) ) return;
+    let cName = name + COOKIE_CHUNK_COUNT_SUFFIX;
+    let chunkCount = parseInt( getCookie(cName) );
+    let chunk = 0;
+
+    setCookie(cName, "", -100);
+
+    while (chunk < chunkCount) {
+        setCookie(name + COOKIE_CHUNK_NUM_SUFFIX + chunk, "", -100);
+        chunk++;
+    }
+}
+
+function cookie_chunked_exists(name) {
+    let existingCount = getCookie(name + COOKIE_CHUNK_COUNT_SUFFIX);
+    return parseInt(existingCount) ? true: false;
 }
 
 window._sc = setCookie;

@@ -11,7 +11,6 @@ import { create_tag_pools } from "./tag-pools.mod.js";
 window._to_uri = query_string_from_inputs;
 window._restore = x => {restore_form_values(); create_tag_pools(); }
 window._r = restore_form_values;
-
 window._url_populate = url_populate;
 
 import { FORM_RESTORE_CONFIG, set_form_defaults } from "./config.mod.js";
@@ -63,7 +62,7 @@ export function query_string_from_inputs(selectors = '.form-save') {
 
 		if (value === null) continue;
 
-		 try {	// I need to encode apostrophes to %27 of -_.!~*'()
+		 try {	// I need to encode apostrophes to %27 to make it match location.search
 			uri.push(`${encodeURIComponent(name).replaceAll("'", "%27")}=${encodeURIComponent(value).replaceAll("'", "%27")}`);
 		 } catch (e) {
 			console.error("ERROR encoding URI Component:", e);
@@ -106,19 +105,19 @@ export function restore_form_values(selector = '.form-save', opts)
 		const name = field.name ? field.name : field.id;
 
 		if ( !name ) {
-			if (FORM_RESTORE_VERBOSE) console.error("restore_form_values : Field does not have a name : ", field);
+			if (FORM_RESTORE_VERBOSE) console.error("restore_form_values : Field does not have a name or id : ", field);
 			continue;
 		}
 
 		if ( !(name in getVars) ) {
-			if (FORM_RESTORE_VERBOSE) console.warning("restore_form_values : field has no url match : ", name)
+			if (FORM_RESTORE_VERBOSE) console.warning("restore_form_values : field has no url param match : ", name)
 			// should use field default
 			field.value = field.defaultValue ?? "";
 			continue;
 		}
 
 		if ( !field.type ) {
-			if (FORM_RESTORE_VERBOSE) console.error("restore_form_values : field has no type : ", field)
+			if (FORM_RESTORE_VERBOSE) console.error("restore_form_values : field has no type : ", field);
 			continue;
 		}
 
@@ -199,7 +198,7 @@ function get_query_string_params(params = window.location.search) {
 				getVars[decodeURIComponent(name)] = decodeURIComponent(value);
 		});
 	} catch (e) {
-		console.log("ERROR: quert_string_params_to_array -", e);
+		console.log("ERROR: get_query_string_params	 -", e);
 	}
 	return getVars;
 }
@@ -210,7 +209,7 @@ function get_query_string_params(params = window.location.search) {
  * Shoves the url into the address bar and saves it to localstorage
  * Because this is called 150+ times if allchange() is triggered I'm putting measures in place
  * I did a setTimeout before but it wasn't the problem.  One of my out filters for voices commands was
- * This was getting called during the repopulation of form fields before ! was added to commands and then
+ * called during the repopulation of form fields before the ! was added and then
  * they were just being blindly stripped of the first character
  */
 

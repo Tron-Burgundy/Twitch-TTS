@@ -30,7 +30,8 @@
     <div class="mb-5">&nbsp;</div>
     <div class="tab-content" id="ttstabs">
       <div class="tab-pane is-active">
-        <div class="has-text-centered subtitle mb-0" id="mv">master volume
+        <div class="has-text-centered subtitle mb-0">
+          <div id="mv">master volume</div>
           <div class="is-flex is-align-content-center is-flex-wrap-nowrap">
             <div class="is-flex-grow-1">
               <input class="is-small form-save" id="vm" style="width: 100%" type="range" min="0" max="100" step="1" value="100" data-to="volumemaster" data-type="float" data-for="volumemasterdisplay">
@@ -1172,6 +1173,10 @@
             </div>
             <div class="hide-buttons" id="allowedTagPool"></div>
           </div>
+          <div class="box">
+            <button class="savecookieConf button is-link">save settings to cookie</button>
+            <button class="loadcookieConf button is-link">load settings from cookie</button>
+          </div>
           <div class="is-hidden">
             <div class="title is-4">These will be hidden shadows</div>
             <label class="label">Nicknames</label>
@@ -1208,8 +1213,8 @@
               <!--input.input#replaceword(placeholder="replace term" autocomplete="off" title="replace this term")-->
               <!--input.input#replacewith(placeholder="replace with" autocomplete="off" title="replace with this")-->
               <!--.field.has-addons-->
-              <input class="input" style="width: 100%; max-width: 24em;" id="replaceterm" placeholder="replace term" title="replace term">
-              <input class="input" style="width: 100%; max-width: 24em;" id="replacewith" placeholder="replace with (can be blank)" title="replace with">
+              <input class="input" id="replaceterm" style="width: 100%; max-width: 24em;" placeholder="replace term" title="replace term">
+              <input class="input" id="replacewith" style="width: 100%; max-width: 24em;" placeholder="replace with (can be blank)" title="replace with">
               <button class="button is-success" id="replacetermbtn"><span class="icon"><i class="fas fa-check"></i></span></button>
             </div>
             <div class="is-flex is-align-items-center is-flex-shrink-1">
@@ -1252,6 +1257,10 @@ with it off it would become 'face'">
             <label class="label" for="replacedel">delete</label>
           </div>
           <div class="hide-buttons" id="replaceTagPool"></div>
+        </div>
+        <div class="box">
+          <button class="savecookieConf button is-link">save settings to cookie</button>
+          <button class="loadcookieConf button is-link">load settings from cookie</button>
         </div>
         <div class="is-hidden">
           <input class="input form-save" id="replace" type="text" data-to="replaceTerms" data-type="replacers" value="(bits|subs|donate)\w*--WONGA!__R!.!http://--blah~blah~linky~link__SW!.!https://--w~w~w~dot~widdle~dot~piddle~dot~mub~mub~dot~cobblers__SW!.!www.--linky~lonky~loo__SW!.!">

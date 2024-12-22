@@ -38,7 +38,6 @@ export const FORM_IN_OUT_FILTERS = { // apply to keys or elements?
     vcmd: { // turn "I'm bAdly done" -> i_m_badly_done and if it's empty then return null
         out: x => {//console.log("vmd out has", x);
             x = x
-                // .replace(/^!./, "")
                 .replace(/\W+/g, " ")
                 .trim()
                 .replace(" ", "_")
@@ -49,7 +48,6 @@ export const FORM_IN_OUT_FILTERS = { // apply to keys or elements?
     vselect: {
         out: x => x.length ? x : null
     },
-
 
 }
 
@@ -112,5 +110,3 @@ export function to_key_value_string(valObj, target) {
 export function split_to_array(str) {
     return str.split(/[^a-zA-Z0-9-_$£.]/).filter(e => e);
 }
-"; "
-
